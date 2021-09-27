@@ -39,9 +39,11 @@ pub(crate) fn check_for_unit_movement(
             }
         }
     }
+
 }
 
 fn translate_mouse_position_to_world_hex(mouse_cursor_position: Vec2, screen_width: f32, screen_height: f32, camera_x: f64, camera_y: f64) -> Hex {
+    
     let screen_position = Point::new((mouse_cursor_position.x - screen_width * HALF) as f64, (mouse_cursor_position.y - screen_height * HALF) as f64);
     let world_position = Point::new(screen_position.x + camera_x, screen_position.y + camera_y);
     let fractional_hex = crate::hexagons::pixel_to_hex_pointy_layout(world_position, LAYOUT_SIZE, SCALE);

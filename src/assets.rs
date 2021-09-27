@@ -2,6 +2,8 @@ use std::collections::HashMap;
 use bevy::prelude::*;
 
 pub(crate) fn load_images(asset_server: &Res<AssetServer>, materials: &mut ResMut<Assets<ColorMaterial>>) -> HashMap<i32, Vec<Handle<ColorMaterial>>> {
+    // loads assets using the Bevy asset_server
+
     let folders = [ ( "TerrainTiles/Basic", 0 ),
                                    ( "TerrainTiles/Cold", 1 ),
                                    ( "TerrainTiles/Desert", 2 ),
@@ -22,6 +24,7 @@ pub(crate) fn load_images(asset_server: &Res<AssetServer>, materials: &mut ResMu
 }
 
 fn load_images_from_asset_server(folder: &str, asset_server: &Res<AssetServer>, materials: &mut ResMut<Assets<ColorMaterial>>) -> Vec<Handle<ColorMaterial>> {
+    // reads a manifest file in folder and loads all images described in the manifest file
 
     let path = format!("assets/images/{}/manifest.txt", folder);
     let msg = format!("Unable to read file: {}", path);

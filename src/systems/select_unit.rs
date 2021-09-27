@@ -8,8 +8,9 @@ pub(crate) fn select_unit(
     images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
     mut unit_query: Query<(Entity, &crate::components::Unit), With<crate::components::ToBeSelectedTag>>,
     mut camera_query: Query<&mut Transform, (With<Camera>, With<crate::components::MainCameraTag>)>
-)
-{
+) {
+    // focuses camera on unit that is selected and changes unit to active
+
     for mut transform in camera_query.iter_mut() {
         for (entity, unit) in unit_query.iter_mut() {
 
@@ -28,4 +29,5 @@ pub(crate) fn select_unit(
             commands.entity(entity).despawn_recursive();
         }
     }
+
 }

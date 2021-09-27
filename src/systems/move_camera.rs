@@ -9,6 +9,8 @@ pub(crate) fn move_camera(
     time: Res<Time>,
     mut camera_query: Query<&mut Transform, (With<Camera>, With<crate::components::MainCameraTag>)>
 ) {
+    // moves the camera if user presses arrow keys on keyboard or Left-cicks and drags the mouse
+
     for mut transform in camera_query.iter_mut() {
         let translate_amount = 1000.0 * time.delta_seconds();
 
@@ -31,4 +33,5 @@ pub(crate) fn move_camera(
             }
         }
     }
+
 }

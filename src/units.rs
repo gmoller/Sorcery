@@ -1,10 +1,11 @@
 use std::collections;
 use bevy::prelude::*;
 
-use crate::{HEX_OFFSET_Y, HEX_SIZE, LAYOUT_SIZE, SCALE, THREE_QUARTERS, hexagons::Point};
+use crate::{HEX_OFFSET_Y, HEX_SIZE, LAYOUT_SIZE, SCALE, THREE_QUARTERS};
 
 pub(crate) fn spawn_unit(commands: &mut Commands, images: &collections::HashMap<i32, Vec<Handle<ColorMaterial>>>, location_hex_axial: crate::hexagons::Hex, image_id: u8, as_to_be_selected: bool, as_selected: bool) {    
-    
+    // spawns a unit entity into the ECS
+
     let world_position = location_hex_axial.hex_to_pixel(LAYOUT_SIZE, SCALE); // calculate world position from axial
 
     let value = images.get(&(6));

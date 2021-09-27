@@ -6,6 +6,8 @@ pub(crate) fn create_sprite_bundle(
     scale: Vec3,
     image: Handle<ColorMaterial>
 ) -> SpriteBundle {
+    // instantiates a sprite_bundle
+
     let sprite = Sprite::new(size);
     let transform = Transform {
         translation: position,
