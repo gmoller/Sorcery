@@ -1,0 +1,4 @@
+barbarian_spearmen_2.png
+barbarian_spearmen_active.png
+barbarian_spearmen_hovered.png
+barbarian_spearmen_inactive.png
