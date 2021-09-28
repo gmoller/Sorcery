@@ -46,7 +46,7 @@ fn generate_temperature(width: u16, height: u16) -> Vec<f64> {
     let temperature_values = generate_temperature_values(width, height);
 
     let mut temperature = Vec::new();
-    for i in 0..width*height {
+    for i in 0..width * height {
         let val = (temperature_noise[i as usize] / 4.0) + temperature_values[i as usize];
         temperature.push(val);
     }

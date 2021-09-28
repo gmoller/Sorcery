@@ -21,13 +21,12 @@ mod world_map_generator;
 
 const SCALE: (f32, f32) = (1.0, 1.0);
 const HALF: f32 = 0.5;
-const THREE_QUARTERS: f32 = 0.75;
 //const HEX_SIZE: (f32, f32) = (32.0, 48.0);
 //const HEX_SIZE: (f32, f32) = (64.0, 96.0);
 //const HEX_SIZE: (f32, f32) = (128.0, 192.0);
 const HEX_SIZE: (f32, f32) = (256.0, 384.0);
 const HEX_OFFSET_Y: f32 = HEX_SIZE.1 / 6.0;
-const LAYOUT_SIZE: (f32, f32) = (HEX_SIZE.0 * 0.57421875, HEX_SIZE.1 * 0.3125);
+const LAYOUT_SIZE: (f32, f32) = (HEX_SIZE.0 * 0.57421875, HEX_SIZE.1 * 0.3351);
 const CROSSHAIR: &str = "images/crosshair.png";
 
 fn main() {
@@ -46,8 +45,8 @@ fn main() {
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)
-        .add_plugin(LogDiagnosticsPlugin::default())
-        .add_plugin(FrameTimeDiagnosticsPlugin::default())
+        //.add_plugin(LogDiagnosticsPlugin::default())
+        //.add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_startup_system(setup_system.system())
         .add_system(exit_on_esc_system.system())
         .add_system(systems::move_camera::move_camera.system())
@@ -74,17 +73,18 @@ fn setup_system(mut commands: Commands, asset_server: Res<AssetServer>, mut mate
     let mut rng = thread_rng();
     let index = rng.gen_range(0..world_map.width * world_map.height);
     //let index = 0;
-    let axial = world_map::convert_index_to_axial(index.into(), world_map.width);
+    let hex = world_map::convert_index_to_axial(index.into(), world_map.width);
     // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
-    let image_id = 3; // 3: inactive spearmen
-    units::spawn_unit(&mut commands, &images, axial, image_id, true, false);
+    
+    units::spawn_unit_composite(&mut commands, &images, hex, 6, 2, true, false);
 
-    draw_crosshair(&asset_server, &mut materials, &mut commands);
+    //draw_crosshair(&asset_server, &mut materials, &mut commands);
 
     // position window
     window.set_position(IVec2::new(0, 0));
 
     commands.insert_resource(images);
+    commands.insert_resource(world_map);
 }
 
 fn draw_crosshair(asset_server: &Res<AssetServer>, materials: &mut ResMut<Assets<ColorMaterial>>, commands: &mut Commands) {

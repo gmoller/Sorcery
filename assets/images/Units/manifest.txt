@@ -1,4 +1,7 @@
-barbarian_spearmen_2.png
-barbarian_spearmen_active.png
-barbarian_spearmen_hovered.png
-barbarian_spearmen_inactive.png
+backdrop.png
+backlight.png
+unit_frame_inactive.png
+unit_frame_hovered.png
+unit_frame_active.png
+unit_hp_fill.png
+Unit_Icon_BarbarianSpearmen_Transparent.png

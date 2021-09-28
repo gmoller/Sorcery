@@ -25,28 +25,3 @@ pub(crate) fn create_sprite_bundle(
 
     return sprite_bundle;
 }
-
-// pub(crate) fn create_spritesheet_bundle(
-//     position: Vec3,
-//     scale: Vec3,
-//     texture_atlas_handle: &Handle<TextureAtlas>,
-//     sprite_index: u32
-// ) -> SpriteSheetBundle {
-//     //let sprite = TextureAtlasSprite::new(sprite_index);
-//     let transform = Transform {
-//         translation: position,
-//         scale: scale,
-//         ..Default::default()
-//     };
-
-//     let mut spritesheet_bundle = SpriteSheetBundle {
-//         transform: transform,
-//         //sprite: sprite,
-//         texture_atlas: texture_atlas_handle.clone(),
-//         ..Default::default()
-//     };
-
-//     spritesheet_bundle.sprite.index = sprite_index;
-
-//     return spritesheet_bundle;
-// }

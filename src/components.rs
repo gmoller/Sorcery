@@ -1,4 +1,6 @@
-use crate::hexagons::Hex;
+use bevy::prelude::Entity;
+
+use crate::hexagons::{Hex, Point};
 
 pub(crate) struct IsMoving {
     pub(crate) destination_hex: Hex // axial hex destination of moving unit
@@ -29,4 +31,12 @@ impl Default for Unit {
     fn default() -> Self {
         Self::new(0, Hex::new_axial(-1, -1))
     }
+}
+
+pub(crate) struct UnitBadge {
+    pub(crate) backdrop: Entity,
+    pub(crate) backlight: Entity,
+    pub(crate) unit_type: Entity,
+    pub(crate) hp_fill: Entity,
+    pub(crate) frame: Entity
 }
