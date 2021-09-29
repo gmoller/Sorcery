@@ -55,6 +55,8 @@ fn main() {
         .add_system(systems::move_camera::move_camera.system())
         .add_system(systems::select_unit::select_unit.system())
         .add_system(systems::check_for_unit_movement::check_for_unit_movement.system())
+        .add_system(systems::check_for_unit_movement::check_for_unit_selection.system())
+        .add_system(systems::check_for_unit_movement::check_for_unit_unselection.system())
         .add_system(systems::move_unit::move_unit.system())
         //.add_system(zoom_camera.system())
         .run();

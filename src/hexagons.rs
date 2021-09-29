@@ -46,6 +46,11 @@ impl Hex {
 
         return result;
     }
+    pub fn all_hex_neighbors(&self) -> [Hex; 6] {
+        let result = all_hex_neighbors(*self);
+
+        return result;
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -62,6 +67,11 @@ impl FractionalHex {
     #[allow(dead_code)]
     pub fn new_cube(q: f64, r: f64, s: f64) -> FractionalHex {
         return FractionalHex { q, r, s };
+    }
+    pub fn round(&self) -> Hex {
+        let result = hex_round(*self);
+
+        return result;
     }
 }
 
@@ -147,7 +157,7 @@ pub fn hex_neighbor(hex: Hex, direction: i32) -> Hex {
     return hex_add(hex, hex_direction(direction));
 }
 
-pub fn all_hex_neighbors(hex: Hex) -> [Hex; 6] {
+fn all_hex_neighbors(hex: Hex) -> [Hex; 6] {
     let hex0 = hex_neighbor(hex, 0);
     let hex1 = hex_neighbor(hex, 1);
     let hex2 = hex_neighbor(hex, 2);
@@ -184,7 +194,7 @@ pub fn hex_distance(a: Hex, b: Hex) -> i32 {
     return hex_length(hex_subtract(a, b));
 }
 
-pub fn hex_round(h: FractionalHex) -> Hex {
+fn hex_round(h: FractionalHex) -> Hex {
     let mut qi: i32 = h.q.round() as i32;
     let mut ri: i32 = h.r.round() as i32;
     let mut si: i32 = h.s.round() as i32;
@@ -262,7 +272,7 @@ pub const LAYOUT_FLAT: Orientation = Orientation {
     start_angle: 0.0,
 };
 
-pub fn hex_to_pixel_pointy_layout(h: Hex, layout_size: (f32, f32), scale: (f32, f32)) -> Point {
+fn hex_to_pixel_pointy_layout(h: Hex, layout_size: (f32, f32), scale: (f32, f32)) -> Point {
     let layout = Layout { orientation: LAYOUT_POINTY, size: Point::new(layout_size.0 as f64 * scale.0 as f64, -layout_size.1 as f64 * scale.1 as f64), origin: Point::new(0.0, 0.0) };
     let result = hex_to_pixel(layout, h);
 
@@ -270,7 +280,7 @@ pub fn hex_to_pixel_pointy_layout(h: Hex, layout_size: (f32, f32), scale: (f32, 
 }
 
 #[allow(dead_code)]
-pub fn hex_to_pixel_flat_layout(h: Hex, layout_size: (f32, f32), scale: (f32, f32)) -> Point {
+fn hex_to_pixel_flat_layout(h: Hex, layout_size: (f32, f32), scale: (f32, f32)) -> Point {
     let layout = Layout { orientation: LAYOUT_FLAT, size: Point::new(layout_size.0 as f64 * scale.0 as f64, -layout_size.1 as f64 * scale.1 as f64), origin: Point::new(0.0, 0.0) };
     let result = hex_to_pixel(layout, h);
 
@@ -290,7 +300,7 @@ fn hex_to_pixel(layout: Layout, h: Hex) -> Point {
     };
 }
 
-pub fn pixel_to_hex_pointy_layout(p: Point, layout_size: (f32, f32), scale: (f32, f32)) -> FractionalHex {
+fn pixel_to_hex_pointy_layout(p: Point, layout_size: (f32, f32), scale: (f32, f32)) -> FractionalHex {
     let layout = Layout { orientation: LAYOUT_POINTY, size: Point::new(layout_size.0 as f64 * scale.0 as f64, -layout_size.1 as f64 * scale.1 as f64), origin: Point::new(0.0, 0.0) };
     let result = pixel_to_hex(layout, p);
 
@@ -298,14 +308,14 @@ pub fn pixel_to_hex_pointy_layout(p: Point, layout_size: (f32, f32), scale: (f32
 }
 
 #[allow(dead_code)]
-pub fn pixel_to_hex_flat_layout(p: Point, layout_size: (f32, f32), scale: (f32, f32)) -> FractionalHex {
+fn pixel_to_hex_flat_layout(p: Point, layout_size: (f32, f32), scale: (f32, f32)) -> FractionalHex {
     let layout = Layout { orientation: LAYOUT_FLAT, size: Point::new(layout_size.0 as f64 * scale.0 as f64, -layout_size.1 as f64 * scale.1 as f64), origin: Point::new(0.0, 0.0) };
     let result = pixel_to_hex(layout, p);
 
     return result;
 }
 
-pub fn pixel_to_hex(layout: Layout, p: Point) -> FractionalHex {
+fn pixel_to_hex(layout: Layout, p: Point) -> FractionalHex {
     let matrix: Orientation = layout.orientation;
     let size: Point = layout.size;
     let origin: Point = layout.origin;

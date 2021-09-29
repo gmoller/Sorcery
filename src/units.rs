@@ -57,6 +57,8 @@ pub(crate) fn spawn_unit_composite(
                 .push_children(&[backdrop, backlight, unit_type, hp_fill, frame])
                 .insert(Unit::new(1, location_hex))
                 .insert(ToBeSelectedTag);
+
+                return;
         }
 
         if as_selected {
@@ -65,7 +67,14 @@ pub(crate) fn spawn_unit_composite(
                 .push_children(&[backdrop, backlight, unit_type, hp_fill, frame])
                 .insert(Unit::new(1, location_hex))
                 .insert(SelectedTag);
+
+                return;
         }
+
+        commands
+            .spawn_bundle((Transform::from_translation(position), GlobalTransform::identity(), UnitBadge { backdrop, backlight, unit_type, hp_fill, frame }))
+            .push_children(&[backdrop, backlight, unit_type, hp_fill, frame])
+            .insert(Unit::new(1, location_hex));
 
     }
 
