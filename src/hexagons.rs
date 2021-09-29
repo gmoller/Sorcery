@@ -11,6 +11,11 @@ impl Point {
     pub(crate) fn new(x: f64, y: f64) -> Point {
         return Point { x, y };
     }
+    pub fn pixel_to_hex(&self, layout_size: (f32, f32), scale: (f32, f32)) -> FractionalHex {
+        let result = pixel_to_hex_pointy_layout(*self, layout_size, scale);
+
+        return result;
+    }
 }
 impl fmt::Display for Point {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

@@ -38,7 +38,7 @@ pub(crate) fn check_for_unit_movement(
 
                         let is_moving = crate::components::IsMoving::new(hex);
                         commands.entity(entity).insert(is_moving);
-                        println!("desination hex {:?}", hex);
+                        //println!("desination hex {:?}", hex);
                         break;
                     }
                 }
@@ -53,7 +53,7 @@ fn translate_mouse_position_to_world_hex(mouse_cursor_position: Vec2, screen_wid
 
     let screen_position = Point::new((mouse_cursor_position.x - screen_width * HALF) as f64, (mouse_cursor_position.y - screen_height * HALF) as f64);
     let world_position = Point::new(screen_position.x + camera_x, screen_position.y + camera_y);
-    let fractional_hex = crate::hexagons::pixel_to_hex_pointy_layout(world_position, LAYOUT_SIZE, SCALE);
+    let fractional_hex = world_position.pixel_to_hex(LAYOUT_SIZE, SCALE);
     let world_hex = crate::hexagons::hex_round(fractional_hex);
 
     return world_hex;

@@ -29,9 +29,7 @@ pub(crate) fn spawn_unit_composite(
 
         let color_material_handle_backdrop = texture_atlas[BACKDROP_GREEN as usize].clone();
         //let color = &mut materials.get_mut(&color_material_handle_backdrop).unwrap().color;
-        //color.set_r(0.0);
-        //color.set_g(1.0);
-        //color.set_b(0.0);
+        //color.set_r(0.0); //color.set_g(1.0); //color.set_b(0.0);
         let color_material_handle_backlight = texture_atlas[BACKLIGHT as usize].clone();
         let color_material_handle_unit_type = texture_atlas[image_id as usize].clone();
         let color_material_handle_unit_hp_fill = texture_atlas[UNIT_HP_FILL as usize].clone();
