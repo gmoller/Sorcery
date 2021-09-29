@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use bevy::{prelude::*, render::camera::Camera};
 
+use crate::constants::{UNIT_FRAME_ACTIVE, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT};
 use crate::{LAYOUT_SIZE, SCALE};
 use crate::components::{MainCameraTag, ToBeSelectedTag, Unit};
 use crate::units::spawn_unit_composite;
@@ -22,8 +23,7 @@ pub(crate) fn select_unit(
             camera_transform.translation.y = world_position.y as f32;
 
             // change unit to active:
-            let image_id: u8 = 6; // 6: spearmen
-            spawn_unit_composite(&mut commands, &images, unit.location_hex, image_id, 4, false, true);
+            spawn_unit_composite(&mut commands, &images, unit.location_hex, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_ACTIVE, false, true);
 
             // remove entity:
             commands.entity(entity).despawn_recursive();

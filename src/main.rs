@@ -1,9 +1,12 @@
 use bevy::{prelude::*, input::system::exit_on_esc_system};
-use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+//use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use rand::{Rng, thread_rng};
+
+use crate::constants::{UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE};
 
 mod assets;
 mod components;
+mod constants;
 mod create_bundles;
 mod hexagons;
 mod noise;
@@ -27,7 +30,7 @@ const HALF: f32 = 0.5;
 const HEX_SIZE: (f32, f32) = (256.0, 384.0);
 const HEX_OFFSET_Y: f32 = HEX_SIZE.1 / 6.0;
 const LAYOUT_SIZE: (f32, f32) = (HEX_SIZE.0 * 0.57421875, HEX_SIZE.1 * 0.3351);
-const CROSSHAIR: &str = "images/crosshair.png";
+//const CROSSHAIR: &str = "images/crosshair.png";
 
 fn main() {
     App::build()
@@ -57,7 +60,13 @@ fn main() {
         .run();
 }
 
-fn setup_system(mut commands: Commands, asset_server: Res<AssetServer>, mut materials: ResMut<Assets<ColorMaterial>>, mut windows: ResMut<Windows>) {
+fn setup_system(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut windows: ResMut<Windows>
+) {
+
     let window = windows.get_primary_mut().unwrap();
     //let screen_size = ScreenSize::new(window.width(), window.height());
     
@@ -76,7 +85,7 @@ fn setup_system(mut commands: Commands, asset_server: Res<AssetServer>, mut mate
     let hex = world_map::convert_index_to_axial(index.into(), world_map.width);
     // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
     
-    units::spawn_unit_composite(&mut commands, &images, hex, 6, 2, true, false);
+    units::spawn_unit_composite(&mut commands, &images, hex, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE, true, false);
 
     //draw_crosshair(&asset_server, &mut materials, &mut commands);
 
@@ -85,14 +94,15 @@ fn setup_system(mut commands: Commands, asset_server: Res<AssetServer>, mut mate
 
     commands.insert_resource(images);
     commands.insert_resource(world_map);
+
 }
 
-fn draw_crosshair(asset_server: &Res<AssetServer>, materials: &mut ResMut<Assets<ColorMaterial>>, commands: &mut Commands) {
-    let texture_handle = asset_server.load(CROSSHAIR);
-    let material = materials.add(texture_handle.into());
-    let sprite_dimensions = Vec2::new(50.0, 50.0);
-    let sprite_scale = Vec3::new(1.0, 1.0, 1.0);
-    let position = Vec3::new(0.0, 0.0, 10.0);
-    let bundle = create_bundles::create_sprite_bundle(sprite_dimensions, position, sprite_scale, material);
-    commands.spawn_bundle(bundle);
-}
+// fn draw_crosshair(asset_server: &Res<AssetServer>, materials: &mut ResMut<Assets<ColorMaterial>>, commands: &mut Commands) {
+//     let texture_handle = asset_server.load(CROSSHAIR);
+//     let material = materials.add(texture_handle.into());
+//     let sprite_dimensions = Vec2::new(50.0, 50.0);
+//     let sprite_scale = Vec3::new(1.0, 1.0, 1.0);
+//     let position = Vec3::new(0.0, 0.0, 10.0);
+//     let bundle = create_bundles::create_sprite_bundle(sprite_dimensions, position, sprite_scale, material);
+//     commands.spawn_bundle(bundle);
+// }

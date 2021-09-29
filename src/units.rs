@@ -1,6 +1,7 @@
 use std::collections;
 use bevy::prelude::*;
 
+use crate::constants::{BACKDROP_GREEN, BACKLIGHT, UNIT_HP_FILL};
 use crate::{HALF, LAYOUT_SIZE, SCALE};
 use crate::create_bundles::create_sprite_bundle;
 use crate::components::{SelectedTag, ToBeSelectedTag, Unit, UnitBadge};
@@ -26,12 +27,14 @@ pub(crate) fn spawn_unit_composite(
         let sprite_scale = Vec3::new(SCALE.0 as f32, SCALE.1 as f32, 1.0);
         let position = Vec3::new(world_position.x as f32, world_position.y as f32, 10.0);
 
-        let color_material_handle_backdrop = texture_atlas[0].clone();
-        //let color = &mut materials.get_mut(color_material_handle_backdrop).unwrap().color;
-        //color.set_a(color.a() * 0.99);
-        let color_material_handle_backlight = texture_atlas[1].clone();
+        let color_material_handle_backdrop = texture_atlas[BACKDROP_GREEN as usize].clone();
+        //let color = &mut materials.get_mut(&color_material_handle_backdrop).unwrap().color;
+        //color.set_r(0.0);
+        //color.set_g(1.0);
+        //color.set_b(0.0);
+        let color_material_handle_backlight = texture_atlas[BACKLIGHT as usize].clone();
         let color_material_handle_unit_type = texture_atlas[image_id as usize].clone();
-        let color_material_handle_unit_hp_fill = texture_atlas[5].clone();
+        let color_material_handle_unit_hp_fill = texture_atlas[UNIT_HP_FILL as usize].clone();
         let color_material_handle_unit_frame = texture_atlas[unit_status_image_id as usize].clone();
 
         let backdrop_bundle = create_sprite_bundle(Vec2::new(104.0, 104.0), Vec3::new(0.0, 0.0, -3.0), sprite_scale, color_material_handle_backdrop);
