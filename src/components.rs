@@ -1,6 +1,6 @@
 use bevy::prelude::Entity;
 
-use crate::hexagons::{Hex, Point};
+use crate::hexagons::Hex;
 
 pub(crate) struct IsMoving {
     pub(crate) destination_hex: Hex // axial hex destination of moving unit

@@ -1,6 +1,7 @@
 use bevy::{prelude::*, input::system::exit_on_esc_system};
 //use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use rand::{Rng, thread_rng};
+use resources::ScreenSize;
 
 use crate::constants::{UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE};
 
@@ -58,7 +59,7 @@ fn setup_system(
 ) {
 
     let window = windows.get_primary_mut().unwrap();
-    //let screen_size = ScreenSize::new(window.width(), window.height());
+    let screen_size = ScreenSize::new(window.width(), window.height());
     
     commands.spawn_bundle(OrthographicCameraBundle::new_2d()).insert(components::MainCameraTag);
     commands.spawn_bundle(UiCameraBundle::default());
@@ -90,6 +91,7 @@ fn setup_system(
 
     commands.insert_resource(images);
     commands.insert_resource(world_map);
+    commands.insert_resource(screen_size);
 
 }
 

@@ -4,7 +4,7 @@ use bevy::{prelude::*, render::camera::Camera};
 use crate::constants::{HALF, LAYOUT_SIZE, SCALE, UNIT_FRAME_ACTIVE, UNIT_FRAME_INACTIVE, UNIT_MOVEMENT_SPEED};
 use crate::components::{IsMoving, MainCameraTag, SelectedTag, ToBeSelectedTag, Unit, UnitBadge};
 use crate::hexagons::{Hex, Point};
-use crate::resources::WorldMap;
+use crate::resources::{ScreenSize, WorldMap};
 
 pub(crate) fn select_unit_system(
     mut commands: Commands,
@@ -36,6 +36,7 @@ pub(crate) fn select_unit_system(
 
 pub(crate) fn check_for_unit_movement_system(
     mut commands: Commands,
+    screen_size: Res<ScreenSize>,
     mouse_input: Res<Input<MouseButton>>,
     windows: Res<Windows>,
     world_map: Res<WorldMap>,
@@ -50,7 +51,7 @@ pub(crate) fn check_for_unit_movement_system(
         let camera_transform = camera_query.single_mut().unwrap();
 
         for (entity, unit) in query.iter() {
-            let value = get_hex_clicked_on(&windows, camera_transform);
+            let value = get_hex_clicked_on(&windows, &screen_size, camera_transform);
 
             if let Some(hex) = value {
                 let neighbors = unit.location_hex.all_hex_neighbors();
@@ -73,6 +74,7 @@ pub(crate) fn check_for_unit_movement_system(
 
 pub(crate) fn check_for_unit_selection_system(
     mut commands: Commands,
+    screen_size: Res<ScreenSize>,
     mouse_input: Res<Input<MouseButton>>,
     windows: Res<Windows>,
     unit_query: Query<(Entity, &Unit), Without<SelectedTag>>,
@@ -86,7 +88,7 @@ pub(crate) fn check_for_unit_selection_system(
         let camera_transform = camera_query.single_mut().unwrap();
 
         for (entity, unit) in unit_query.iter() {
-            let value = get_hex_clicked_on(&windows, camera_transform);
+            let value = get_hex_clicked_on(&windows, &screen_size, camera_transform);
 
             if let Some(hex) = value {
                 if unit.location_hex == hex {
@@ -99,6 +101,7 @@ pub(crate) fn check_for_unit_selection_system(
 
 pub(crate) fn check_for_unit_unselection_system(
     mut commands: Commands,
+    screen_size: Res<ScreenSize>,
     images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
     mouse_input: Res<Input<MouseButton>>,
     windows: Res<Windows>,
@@ -115,7 +118,7 @@ pub(crate) fn check_for_unit_unselection_system(
 
         for (entity, unit, unit_badge) in unit_query.iter() {
 
-            if let Some(hex) = get_hex_clicked_on(&windows, camera_transform) {
+            if let Some(hex) = get_hex_clicked_on(&windows, &screen_size, camera_transform) {
                 if unit.location_hex != hex {
                     // change unit to inactive
                     change_unit_frame(&mut color_material_query, unit_badge, &images, UNIT_FRAME_INACTIVE);
@@ -178,12 +181,11 @@ fn change_unit_frame(color_material_query: &mut Query<&mut Handle<ColorMaterial>
     }
 }
 
-fn get_hex_clicked_on(windows: &Res<Windows>, camera_transform: &Transform) -> Option<Hex> {
+fn get_hex_clicked_on(windows: &Res<Windows>, screen_size: &Res<ScreenSize>, camera_transform: &Transform) -> Option<Hex> {
 
-    let win = windows.get_primary().expect("no primary window");
-    let screen_size = Vec2::new(win.width(), win.height());
-    let value = win.cursor_position();
-    if let Some(cursor_position) = value {
+    let window = windows.get_primary().expect("no primary window");
+
+    if let Some(cursor_position) = window.cursor_position() {
         let hex = translate_mouse_position_to_world_hex(cursor_position, screen_size, camera_transform);
 
         return Some(hex);
@@ -192,9 +194,9 @@ fn get_hex_clicked_on(windows: &Res<Windows>, camera_transform: &Transform) -> O
     return None;
 }
 
-fn translate_mouse_position_to_world_hex(mouse_cursor_position: Vec2, screen_size: Vec2, camera_transform: &Transform) -> Hex {
+fn translate_mouse_position_to_world_hex(mouse_cursor_position: Vec2, screen_size: &Res<ScreenSize>, camera_transform: &Transform) -> Hex {
 
-    let screen_position = mouse_cursor_position - screen_size * HALF;
+    let screen_position = Vec2::new(mouse_cursor_position.x - screen_size.width * HALF, mouse_cursor_position.y - screen_size.height * HALF);
     let world_position = camera_transform.compute_matrix() * screen_position.extend(0.0).extend(1.0);
     //println!("World coords: {}/{}", world_position.x, world_position.y);
 
