@@ -7,6 +7,42 @@ use crate::components::{IsMoving, MainCameraTag, SelectedTag, ToBeSelectedTag, U
 use crate::hexagons::{Hex, Point};
 use crate::resources::WorldMap;
 
+// pub(crate) fn select_unit(
+//     mut commands: Commands,
+//     images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
+//     mut unit_query: Query<(Entity, &Unit, &UnitBadge), With<ToBeSelectedTag>>,
+//     mut color_material_query: Query<&Handle<ColorMaterial>>,
+//     mut camera_query: Query<&mut Transform, (With<Camera>, With<MainCameraTag>)>
+// ) {
+//     // focuses camera on unit that is selected and changes unit to active
+
+//     for mut camera_transform in camera_query.iter_mut() {
+//         for (entity, unit, unit_badge) in unit_query.iter_mut() {
+
+//             // focus camera on unit:
+//             let world_position = unit.location_hex.hex_to_pixel(LAYOUT_SIZE, SCALE); // calculate world position from hex
+//             camera_transform.translation.x = world_position.x as f32;
+//             camera_transform.translation.y = world_position.y as f32;
+
+//             // change unit to active:
+//             if let Ok(mut material) = color_material_query.get_mut(unit_badge.frame) {
+
+//                 let value = images.get(&(6)); // 6: Units
+//                 if let Some(texture_atlas) = value {
+//                     println!("Found!");
+//                     let color_material_handle_unit_frame = texture_atlas[UNIT_FRAME_ACTIVE as usize].clone();
+//                     material = &color_material_handle_unit_frame;
+//                 }
+
+//             } else {
+//                 println!("Nothing found!");
+//             }
+            
+//         }
+//     }
+
+// }
+
 pub(crate) fn select_unit(
     mut commands: Commands,
     images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,

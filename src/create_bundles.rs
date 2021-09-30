@@ -4,7 +4,7 @@ pub(crate) fn create_sprite_bundle(
     size: Vec2,
     position: Vec3,
     scale: Vec3,
-    image: Handle<ColorMaterial>
+    material_handle: Handle<ColorMaterial>
 ) -> SpriteBundle {
     // instantiates a sprite_bundle
 
@@ -18,7 +18,7 @@ pub(crate) fn create_sprite_bundle(
     let sprite_bundle = SpriteBundle {
         transform,
         sprite,
-        material: image,
+        material: material_handle,
         //visible: Visible { is_visible: false, is_transparent: false },
         ..Default::default()
     };

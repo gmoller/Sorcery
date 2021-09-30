@@ -20,8 +20,6 @@ mod units;
 mod world_map;
 mod world_map_generator;
 
-//const CROSSHAIR: &str = "images/crosshair.png";
-
 fn main() {
     App::build()
         .insert_resource(ClearColor(Color::BLACK)) // PINK
