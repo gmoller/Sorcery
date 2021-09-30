@@ -1,13 +1,12 @@
 use std::collections;
 use bevy::prelude::*;
 
-use crate::constants::{BACKDROP_GREEN, BACKLIGHT, UNIT_HP_FILL};
-use crate::{HALF, LAYOUT_SIZE, SCALE};
+use crate::constants::{BACKDROP_GREEN, BACKLIGHT, HALF, LAYOUT_SIZE, SCALE, UNIT_HP_FILL};
 use crate::create_bundles::create_sprite_bundle;
 use crate::components::{SelectedTag, ToBeSelectedTag, Unit, UnitBadge};
 use crate::hexagons::Hex;
 
-pub(crate) fn spawn_unit_composite(
+pub(crate) fn spawn_unit(
     commands: &mut Commands,
     images: &collections::HashMap<i32, Vec<Handle<ColorMaterial>>>,
     location_hex: Hex,

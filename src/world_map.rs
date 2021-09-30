@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use bevy::prelude::*;
 
-use crate::{HEX_OFFSET_Y, HEX_SIZE, LAYOUT_SIZE, SCALE};
+use crate::constants::{HEX_OFFSET_Y, HEX_SIZE, LAYOUT_SIZE, SCALE};
 use crate::hexagons::*;
 use crate::resources::WorldMap;
 

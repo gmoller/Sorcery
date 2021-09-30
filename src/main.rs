@@ -12,24 +12,14 @@ mod hexagons;
 mod noise;
 mod resources;
 mod systems {
-    pub(crate) mod check_for_unit_movement;
+    pub(crate) mod unit_systems;
     pub(crate) mod move_camera;
-    pub(crate) mod move_unit;
-    pub(crate) mod select_unit;
     pub(crate) mod zoom_camera;
 }
 mod units;
 mod world_map;
 mod world_map_generator;
 
-const SCALE: (f32, f32) = (1.0, 1.0);
-const HALF: f32 = 0.5;
-//const HEX_SIZE: (f32, f32) = (32.0, 48.0);
-//const HEX_SIZE: (f32, f32) = (64.0, 96.0);
-//const HEX_SIZE: (f32, f32) = (128.0, 192.0);
-const HEX_SIZE: (f32, f32) = (256.0, 384.0);
-const HEX_OFFSET_Y: f32 = HEX_SIZE.1 / 6.0;
-const LAYOUT_SIZE: (f32, f32) = (HEX_SIZE.0 * 0.57421875, HEX_SIZE.1 * 0.3351);
 //const CROSSHAIR: &str = "images/crosshair.png";
 
 fn main() {
@@ -53,12 +43,12 @@ fn main() {
         .add_startup_system(setup_system.system())
         .add_system(exit_on_esc_system.system())
         .add_system(systems::move_camera::move_camera.system())
-        .add_system(systems::select_unit::select_unit.system())
-        .add_system(systems::check_for_unit_movement::check_for_unit_movement.system())
-        .add_system(systems::check_for_unit_movement::check_for_unit_selection.system())
-        .add_system(systems::check_for_unit_movement::check_for_unit_unselection.system())
-        .add_system(systems::move_unit::move_unit.system())
         //.add_system(zoom_camera.system())
+        .add_system(systems::unit_systems::select_unit.system())
+        .add_system(systems::unit_systems::check_for_unit_movement.system())
+        .add_system(systems::unit_systems::check_for_unit_selection.system())
+        .add_system(systems::unit_systems::check_for_unit_unselection.system())
+        .add_system(systems::unit_systems::move_unit.system())
         .run();
 }
 
@@ -83,11 +73,17 @@ fn setup_system(
     // create unit on random location
     let mut rng = thread_rng();
     let index = rng.gen_range(0..world_map.width * world_map.height);
-    //let index = 0;
+    let index = 0;
     let hex = world_map::convert_index_to_axial(index.into(), world_map.width);
     // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
     
-    units::spawn_unit_composite(&mut commands, &images, hex, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE, true, false);
+    units::spawn_unit(&mut commands, &images, hex, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE, true, false);
+
+    let index = 1;
+    let hex = world_map::convert_index_to_axial(index.into(), world_map.width);
+    // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
+    
+    units::spawn_unit(&mut commands, &images, hex, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE, false, false);
 
     //draw_crosshair(&asset_server, &mut materials, &mut commands);
 
