@@ -1,75 +1,40 @@
 use std::collections::HashMap;
 use bevy::{prelude::*, render::camera::Camera};
 
-use crate::constants::{HALF, LAYOUT_SIZE, SCALE, UNIT_FRAME_ACTIVE, UNIT_FRAME_INACTIVE, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_MOVEMENT_SPEED};
-use crate::units::spawn_unit;
-use crate::components::{IsMoving, MainCameraTag, SelectedTag, ToBeSelectedTag, Unit};
+use crate::constants::{HALF, LAYOUT_SIZE, SCALE, UNIT_FRAME_ACTIVE, UNIT_FRAME_INACTIVE, UNIT_MOVEMENT_SPEED};
+use crate::components::{IsMoving, MainCameraTag, SelectedTag, ToBeSelectedTag, Unit, UnitBadge};
 use crate::hexagons::{Hex, Point};
 use crate::resources::WorldMap;
 
-// pub(crate) fn select_unit(
-//     mut commands: Commands,
-//     images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
-//     mut unit_query: Query<(Entity, &Unit, &UnitBadge), With<ToBeSelectedTag>>,
-//     mut color_material_query: Query<&Handle<ColorMaterial>>,
-//     mut camera_query: Query<&mut Transform, (With<Camera>, With<MainCameraTag>)>
-// ) {
-//     // focuses camera on unit that is selected and changes unit to active
-
-//     for mut camera_transform in camera_query.iter_mut() {
-//         for (entity, unit, unit_badge) in unit_query.iter_mut() {
-
-//             // focus camera on unit:
-//             let world_position = unit.location_hex.hex_to_pixel(LAYOUT_SIZE, SCALE); // calculate world position from hex
-//             camera_transform.translation.x = world_position.x as f32;
-//             camera_transform.translation.y = world_position.y as f32;
-
-//             // change unit to active:
-//             if let Ok(mut material) = color_material_query.get_mut(unit_badge.frame) {
-
-//                 let value = images.get(&(6)); // 6: Units
-//                 if let Some(texture_atlas) = value {
-//                     println!("Found!");
-//                     let color_material_handle_unit_frame = texture_atlas[UNIT_FRAME_ACTIVE as usize].clone();
-//                     material = &color_material_handle_unit_frame;
-//                 }
-
-//             } else {
-//                 println!("Nothing found!");
-//             }
-            
-//         }
-//     }
-
-// }
-
-pub(crate) fn select_unit(
+pub(crate) fn select_unit_system(
     mut commands: Commands,
     images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
-    mut unit_query: Query<(Entity, &Unit), With<ToBeSelectedTag>>,
+    mut unit_query: Query<(Entity, &Unit, &UnitBadge), With<ToBeSelectedTag>>,
+    mut color_material_query: Query<&mut Handle<ColorMaterial>>,
     mut camera_query: Query<&mut Transform, (With<Camera>, With<MainCameraTag>)>
 ) {
     // focuses camera on unit that is selected and changes unit to active
 
-    for mut camera_transform in camera_query.iter_mut() {
-        for (entity, unit) in unit_query.iter_mut() {
+    let mut camera_transform = camera_query.single_mut().unwrap();
 
-            // focus camera on unit:
-            let world_position = unit.location_hex.hex_to_pixel(LAYOUT_SIZE, SCALE); // calculate world position from hex
-            camera_transform.translation.x = world_position.x as f32;
-            camera_transform.translation.y = world_position.y as f32;
+    for (entity, unit, unit_badge) in unit_query.iter_mut() {
 
-            // change unit to active:
-            spawn_unit(&mut commands, &images, unit.location_hex, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_ACTIVE, false, true);
+        // focus camera on unit
+        let world_position = unit.location_hex.hex_to_pixel(LAYOUT_SIZE, SCALE); // calculate world position from hex
+        camera_transform.translation.x = world_position.x as f32;
+        camera_transform.translation.y = world_position.y as f32;
 
-            // remove entity:
-            commands.entity(entity).despawn_recursive();
-        }
+        // change unit to active
+        change_unit_frame(&mut color_material_query, unit_badge, &images, UNIT_FRAME_ACTIVE);
+
+        commands.entity(entity).remove::<ToBeSelectedTag>();
+        commands.entity(entity).insert(SelectedTag);
+        
     }
 
 }
 
-pub(crate) fn check_for_unit_movement(
+pub(crate) fn check_for_unit_movement_system(
     mut commands: Commands,
     mouse_input: Res<Input<MouseButton>>,
     windows: Res<Windows>,
@@ -106,12 +71,11 @@ pub(crate) fn check_for_unit_movement(
     }
 }
 
-pub(crate) fn check_for_unit_selection(
+pub(crate) fn check_for_unit_selection_system(
     mut commands: Commands,
-    images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
     mouse_input: Res<Input<MouseButton>>,
     windows: Res<Windows>,
-    query: Query<(Entity, &Unit), Without<SelectedTag>>,
+    unit_query: Query<(Entity, &Unit), Without<SelectedTag>>,
     mut camera_query: Query<&Transform, (With<Camera>, With<MainCameraTag>)>
 ) {
     // if a unit is unselected and mouse left clicked in the hex that the unit is on
@@ -121,28 +85,25 @@ pub(crate) fn check_for_unit_selection(
 
         let camera_transform = camera_query.single_mut().unwrap();
 
-        for (entity, unit) in query.iter() {
+        for (entity, unit) in unit_query.iter() {
             let value = get_hex_clicked_on(&windows, camera_transform);
 
             if let Some(hex) = value {
                 if unit.location_hex == hex {
-                    // change unit to active:
-                    spawn_unit(&mut commands, &images, unit.location_hex, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_ACTIVE, false, true);
-
-                    // remove entity:
-                    commands.entity(entity).despawn_recursive();
+                    commands.entity(entity).insert(ToBeSelectedTag);
                 }
             }
         }
     }
 }
 
-pub(crate) fn check_for_unit_unselection(
+pub(crate) fn check_for_unit_unselection_system(
     mut commands: Commands,
     images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
     mouse_input: Res<Input<MouseButton>>,
     windows: Res<Windows>,
-    query: Query<(Entity, &Unit), (With<SelectedTag>, Without<IsMoving>)>,
+    unit_query: Query<(Entity, &Unit, &UnitBadge), (With<SelectedTag>, Without<IsMoving>)>,
+    mut color_material_query: Query<&mut Handle<ColorMaterial>>,
     mut camera_query: Query<&Transform, (With<Camera>, With<MainCameraTag>)>
 ) {
     // if a unit is selected and mouse left clicked in a hex other than the one the selected unit is on
@@ -152,23 +113,69 @@ pub(crate) fn check_for_unit_unselection(
 
         let camera_transform = camera_query.single_mut().unwrap();
 
-        for (entity, unit) in query.iter() {
-            let value = get_hex_clicked_on(&windows, camera_transform);
+        for (entity, unit, unit_badge) in unit_query.iter() {
 
-            if let Some(hex) = value {
+            if let Some(hex) = get_hex_clicked_on(&windows, camera_transform) {
                 if unit.location_hex != hex {
-                    //commands.entity(entity).remove::<SelectedTag>();
+                    // change unit to inactive
+                    change_unit_frame(&mut color_material_query, unit_badge, &images, UNIT_FRAME_INACTIVE);
 
-                    // change unit to inactive:
-                    spawn_unit(&mut commands, &images, unit.location_hex, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE, false, false);
-
-                    // remove entity:
-                    commands.entity(entity).despawn_recursive();
+                    commands.entity(entity).remove::<SelectedTag>();
                 }
             }
+
         }
     }
 
+}
+
+pub(crate) fn move_unit_system(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut query: Query<(Entity, &mut Transform, &mut crate::components::Unit, &crate::components::IsMoving)>
+) {
+    // if a unit is moving, adjust it's transform to move closer to it's destination
+    // if it has arrived at it's destination, remove the IsMoving component and set it's location
+
+    for (entity, mut unit_transform, mut unit, is_moving) in query.iter_mut() {
+
+        let unit_translation = &mut unit_transform.translation;
+        let current_point = Point::new(unit_translation.x.into(), unit_translation.y.into());
+        let desintation_point = is_moving.destination_hex.hex_to_pixel(LAYOUT_SIZE, SCALE);
+        //println!("current_point: {:?}", current_point);
+        //println!("desintation_point: {:?}", desintation_point);
+        let direction: Vec2 = calculate_direction(current_point, desintation_point);
+
+        unit_translation.x += direction.x * time.delta_seconds();
+        unit_translation.y += direction.y * time.delta_seconds();
+
+        let current_point = Point::new(unit_translation.x.into(), unit_translation.y.into());
+        let arrived_at_destination = arrived_at_destination(current_point, desintation_point, direction);
+        if arrived_at_destination {
+            unit.location_hex = is_moving.destination_hex;
+            commands.entity(entity).remove::<IsMoving>();
+            unit_translation.x = desintation_point.x as f32;
+            unit_translation.y = desintation_point.y as f32;
+
+            // TODO: if unit badge is off screen, focus camera on unit
+            // TODO: subtract movement_points
+        }
+
+    }
+
+}
+
+fn change_unit_frame(color_material_query: &mut Query<&mut Handle<ColorMaterial>>, unit_badge: &UnitBadge, images: &Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>, image_id: u8) {
+    if let Ok(mut material) = color_material_query.get_mut(unit_badge.frame) {
+        if let Some(texture_atlas) = images.get(&(6)) { // 6: Units
+            let color_material_handle_unit_frame = texture_atlas[image_id as usize].clone();
+            *material = color_material_handle_unit_frame;
+        } else {
+            panic!("Image not found!");
+        }
+    } else {
+        panic!("Image not found!");
+    }
 }
 
 fn get_hex_clicked_on(windows: &Res<Windows>, camera_transform: &Transform) -> Option<Hex> {
@@ -209,42 +216,6 @@ fn check_if_off_map(hex: Hex, world_map_width: u16, world_map_height: u16) -> bo
     if hex.q > max_q_for_row { return true;}
 
     return false;
-}
-
-pub(crate) fn move_unit(
-    mut commands: Commands,
-    time: Res<Time>,
-    mut query: Query<(Entity, &mut Transform, &mut crate::components::Unit, &crate::components::IsMoving)>
-) {
-    // if a unit is moving, adjust it's transform to move closer to it's destination
-    // if it has arrived at it's destination, remove the IsMoving component and set it's location
-
-    for (entity, mut unit_transform, mut unit, is_moving) in query.iter_mut() {
-
-        let unit_translation = &mut unit_transform.translation;
-        let current_point = Point::new(unit_translation.x.into(), unit_translation.y.into());
-        let desintation_point = is_moving.destination_hex.hex_to_pixel(LAYOUT_SIZE, SCALE);
-        //println!("current_point: {:?}", current_point);
-        //println!("desintation_point: {:?}", desintation_point);
-        let direction: Vec2 = calculate_direction(current_point, desintation_point);
-
-        unit_translation.x += direction.x * time.delta_seconds();
-        unit_translation.y += direction.y * time.delta_seconds();
-
-        let current_point = Point::new(unit_translation.x.into(), unit_translation.y.into());
-        let arrived_at_destination = arrived_at_destination(current_point, desintation_point, direction);
-        if arrived_at_destination {
-            unit.location_hex = is_moving.destination_hex;
-            commands.entity(entity).remove::<IsMoving>();
-            unit_translation.x = desintation_point.x as f32;
-            unit_translation.y = desintation_point.y as f32;
-
-            // TODO: if unit badge is off screen, focus camera on unit
-            // TODO: subtract movement_points
-        }
-
-    }
-
 }
 
 fn calculate_direction(current_point: crate::hexagons::Point, desintation_point: crate::hexagons::Point) -> Vec2 {

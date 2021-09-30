@@ -40,13 +40,13 @@ fn main() {
         //.add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_startup_system(setup_system.system())
         .add_system(exit_on_esc_system.system())
-        .add_system(systems::move_camera::move_camera.system())
+        .add_system(systems::move_camera::move_camera_system.system())
         //.add_system(zoom_camera.system())
-        .add_system(systems::unit_systems::select_unit.system())
-        .add_system(systems::unit_systems::check_for_unit_movement.system())
-        .add_system(systems::unit_systems::check_for_unit_selection.system())
-        .add_system(systems::unit_systems::check_for_unit_unselection.system())
-        .add_system(systems::unit_systems::move_unit.system())
+        .add_system(systems::unit_systems::select_unit_system.system())
+        .add_system(systems::unit_systems::check_for_unit_movement_system.system())
+        .add_system(systems::unit_systems::check_for_unit_selection_system.system())
+        .add_system(systems::unit_systems::check_for_unit_unselection_system.system())
+        .add_system(systems::unit_systems::move_unit_system.system())
         .run();
 }
 
