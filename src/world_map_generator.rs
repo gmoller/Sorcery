@@ -117,38 +117,38 @@ fn determine_terrain(elevation: f64, moisture: f64, temperature: f64) -> crate::
     //      (0.35, 0.6) - (0.0, 0.3) - (0.0, 0.3) => Cold::DirtCold (1;0-3)
 
     let list = vec![
-        (0.0,  0.35, 0.0, 0.1, 0.0, 1.0, 1, 42, 45,  0),    // Water - Cold                      => Cold::OceanIceberg
-        (0.0,  0.35, 0.1, 1.0, 0.0, 1.0, 0, 32, 35,  1),    // Water - the rest                  => Basic::Ocean
+        (0.0,  0.35, 0.0, 0.1, 0.0, 1.0, 1, 42, 45,  1),    // Water - Cold                      => Cold::OceanIceberg
+        (0.0,  0.35, 0.1, 1.0, 0.0, 1.0, 0, 32, 35,  2),    // Water - the rest                  => Basic::Ocean
 
-        (0.35, 0.6,  0.0, 0.3, 0.0, 0.3, 1,  0,  3,  2),    // Flat - Cold - Dry                 => Cold::DirtCold
-        (0.35, 0.6,  0.0, 0.3, 0.3, 0.7, 1, 42, 46,  3),    // Flat - Cold - Goldilocks          => Cold::PlainsCold
-        (0.35, 0.6,  0.0, 0.3, 0.7, 1.0, 1, 47, 51,  4),    // Flat - Cold - Rainy               => Cold::PlainsColdSnowCovered
-        (0.35, 0.6,  0.3, 0.7, 0.0, 0.3, 0,  8, 11,  5),    // Flat - Temperate - Dry            => Basic::Dirt
-        (0.35, 0.6,  0.3, 0.7, 0.3, 0.7, 0, 36, 39,  6),    // Flat - Temperate - Goldilocks     => Basic::Plains
-        (0.35, 0.6,  0.3, 0.7, 0.7, 1.0, 0, 12, 15,  7),    // Flat - Temperate - Rainy          => Basic::ForestBroadleaf
-        (0.35, 0.6,  0.7, 1.0, 0.0, 0.3, 0,  4,  7,  8),    // Flat - Hot - Dry                  => Basic::DesertDunes
-        (0.35, 0.6,  0.7, 1.0, 0.3, 0.7, 2, 44, 47,  9),    // Flat - Hot - Goldilocks           => Desert::DesertYellowCactiForest
-        (0.35, 0.6,  0.7, 1.0, 0.7, 1.0, 4, 12, 15, 10),    // Flat - Hot - Rainy                => Tropics::Jungle
+        (0.35, 0.6,  0.0, 0.3, 0.0, 0.3, 1,  0,  3,  3),    // Flat - Cold - Dry                 => Cold::DirtCold
+        (0.35, 0.6,  0.0, 0.3, 0.3, 0.7, 1, 42, 46,  4),    // Flat - Cold - Goldilocks          => Cold::PlainsCold
+        (0.35, 0.6,  0.0, 0.3, 0.7, 1.0, 1, 47, 51,  5),    // Flat - Cold - Rainy               => Cold::PlainsColdSnowCovered
+        (0.35, 0.6,  0.3, 0.7, 0.0, 0.3, 0,  8, 11,  6),    // Flat - Temperate - Dry            => Basic::Dirt
+        (0.35, 0.6,  0.3, 0.7, 0.3, 0.7, 0, 36, 39,  7),    // Flat - Temperate - Goldilocks     => Basic::Plains
+        (0.35, 0.6,  0.3, 0.7, 0.7, 1.0, 0, 12, 15,  8),    // Flat - Temperate - Rainy          => Basic::ForestBroadleaf
+        (0.35, 0.6,  0.7, 1.0, 0.0, 0.3, 0,  4,  7,  9),    // Flat - Hot - Dry                  => Basic::DesertDunes
+        (0.35, 0.6,  0.7, 1.0, 0.3, 0.7, 2, 44, 47, 10),    // Flat - Hot - Goldilocks           => Desert::DesertYellowCactiForest
+        (0.35, 0.6,  0.7, 1.0, 0.7, 1.0, 4, 12, 15, 11),    // Flat - Hot - Rainy                => Tropics::Jungle
 
-        (0.6,  0.75, 0.0, 0.3, 0.0, 0.3, 1, 19, 23, 11),    // Hills - Cold - Dry                => Cold::HillsCold
-        (0.6,  0.75, 0.0, 0.3, 0.3, 0.7, 1, 29, 33, 12),    // Hills - Cold - Goldilocks         => Cold::HillsColdSnowTransition
-        (0.6,  0.75, 0.0, 0.3, 0.7, 1.0, 1, 24, 28, 13),    // Hills - Cold - Rainy              => Basic::HillsColdSnowCovered
-        (0.6,  0.75, 0.3, 0.7, 0.0, 0.3, 0, 16, 19, 14),    // Hills - Temperate - Dry           => Basic::Highlands
-        (0.6,  0.75, 0.3, 0.7, 0.3, 0.7, 0, 20, 23, 15),    // Hills - Temperate - Goldilocks    => Basic::Hills
-        (0.6,  0.75, 0.3, 0.7, 0.7, 1.0, 1,  4,  8, 16),    // Hills - Temperate - Rainy         => Basic::ForestPine
-        (0.6,  0.75, 0.7, 1.0, 0.0, 0.3, 2, 57, 64, 17),    // Hills - Hot - Dry                 => Desert::DesertYellowHills
-        (0.6,  0.75, 0.7, 1.0, 0.3, 0.7, 2, 24, 49, 18),    // Hills - Hot - Goldilocks          => Desert:DesertRedHills
-        (0.6,  0.75, 0.7, 1.0, 0.7, 1.0, 4,  0,  3, 19),    // Hills - Hot - Rainy               => Tropics::Bog
+        (0.6,  0.75, 0.0, 0.3, 0.0, 0.3, 1, 19, 23, 12),    // Hills - Cold - Dry                => Cold::HillsCold
+        (0.6,  0.75, 0.0, 0.3, 0.3, 0.7, 1, 29, 33, 13),    // Hills - Cold - Goldilocks         => Cold::HillsColdSnowTransition
+        (0.6,  0.75, 0.0, 0.3, 0.7, 1.0, 1, 24, 28, 14),    // Hills - Cold - Rainy              => Basic::HillsColdSnowCovered
+        (0.6,  0.75, 0.3, 0.7, 0.0, 0.3, 0, 16, 19, 15),    // Hills - Temperate - Dry           => Basic::Highlands
+        (0.6,  0.75, 0.3, 0.7, 0.3, 0.7, 0, 20, 23, 16),    // Hills - Temperate - Goldilocks    => Basic::Hills
+        (0.6,  0.75, 0.3, 0.7, 0.7, 1.0, 1,  4,  8, 17),    // Hills - Temperate - Rainy         => Basic::ForestPine
+        (0.6,  0.75, 0.7, 1.0, 0.0, 0.3, 2, 57, 64, 18),    // Hills - Hot - Dry                 => Desert::DesertYellowHills
+        (0.6,  0.75, 0.7, 1.0, 0.3, 0.7, 2, 24, 49, 19),    // Hills - Hot - Goldilocks          => Desert:DesertRedHills
+        (0.6,  0.75, 0.7, 1.0, 0.7, 1.0, 4,  0,  3, 20),    // Hills - Hot - Rainy               => Tropics::Bog
 
-        (0.75, 1.0,  0.0, 0.3, 0.0, 0.3, 1, 34, 41, 20),    // Mountain - Cold - Dry             => Cold::MountainSnow
-        (0.75, 1.0,  0.0, 0.3, 0.3, 0.7, 1, 34, 41, 20),    // Mountain - Cold - Goldilocks      => Cold::MountainSnow
-        (0.75, 1.0,  0.0, 0.3, 0.7, 1.0, 1, 34, 41, 20),    // Mountain - Cold - Rainy           => Cold::MountainSnow
-        (0.75, 1.0,  0.3, 0.7, 0.0, 0.3, 2, 71, 78, 21),    // Mountain - Temperate - Dry        => Desert::DesertYellowMesas
-        (0.75, 1.0,  0.3, 0.7, 0.3, 0.7, 0, 28, 31, 22),    // Mountain - Temperate - Goldilocks => Basic::Mountain
-        (0.75, 1.0,  0.3, 0.7, 0.7, 1.0, 0, 28, 31, 22),    // Mountain - Temperate - Rainy      => Basic::Mountain
-        (0.75, 1.0,  0.7, 1.0, 0.0, 0.3, 2, 32, 39, 23),    // Mountain - Hot - Dry              => Desert::DesertRedMountains
-        (0.75, 1.0,  0.7, 1.0, 0.3, 0.7, 2, 32, 39, 23),    // Mountain - Hot - Goldilocks       => Desert::DesertRedMountains
-        (0.75, 1.0,  0.7, 1.0, 0.7, 1.0, 2, 32, 39, 23),    // Mountain - Hot - Rainy            => Desert::DesertRedMountains
+        (0.75, 1.0,  0.0, 0.3, 0.0, 0.3, 1, 34, 41, 21),    // Mountain - Cold - Dry             => Cold::MountainSnow
+        (0.75, 1.0,  0.0, 0.3, 0.3, 0.7, 1, 34, 41, 21),    // Mountain - Cold - Goldilocks      => Cold::MountainSnow
+        (0.75, 1.0,  0.0, 0.3, 0.7, 1.0, 1, 34, 41, 21),    // Mountain - Cold - Rainy           => Cold::MountainSnow
+        (0.75, 1.0,  0.3, 0.7, 0.0, 0.3, 2, 71, 78, 22),    // Mountain - Temperate - Dry        => Desert::DesertYellowMesas
+        (0.75, 1.0,  0.3, 0.7, 0.3, 0.7, 0, 28, 31, 23),    // Mountain - Temperate - Goldilocks => Basic::Mountain
+        (0.75, 1.0,  0.3, 0.7, 0.7, 1.0, 0, 28, 31, 23),    // Mountain - Temperate - Rainy      => Basic::Mountain
+        (0.75, 1.0,  0.7, 1.0, 0.0, 0.3, 2, 32, 39, 24),    // Mountain - Hot - Dry              => Desert::DesertRedMountains
+        (0.75, 1.0,  0.7, 1.0, 0.3, 0.7, 2, 32, 39, 24),    // Mountain - Hot - Goldilocks       => Desert::DesertRedMountains
+        (0.75, 1.0,  0.7, 1.0, 0.7, 1.0, 2, 32, 39, 24),    // Mountain - Hot - Rainy            => Desert::DesertRedMountains
     ];
 
     for item in list {

@@ -1,13 +1,18 @@
 use bevy::{prelude::*, input::system::exit_on_esc_system};
 //use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use rand::{Rng, thread_rng};
+
 use resources::ScreenSize;
 use units::UnitPlugin;
 
+use crate::config::terrain::load_terrain_types;
 use crate::constants::{UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE};
 
 mod assets;
 mod components;
+mod config {
+    pub(crate) mod terrain;
+}
 mod constants;
 mod create_bundles;
 mod hexagons;
@@ -63,6 +68,8 @@ fn setup_system(
 
     let images = assets::load_images(&asset_server, &mut materials);
 
+    load_config(&mut commands);
+
     let world_map = world_map_generator::create_map(60, 40);
     world_map::spawn_map(&mut commands, &world_map, &images);
 
@@ -90,6 +97,11 @@ fn setup_system(
     commands.insert_resource(world_map);
     commands.insert_resource(screen_size);
 
+}
+
+fn load_config(commands: &mut Commands) {
+    let terrain_types = load_terrain_types();
+    commands.insert_resource(terrain_types);
 }
 
 // fn draw_crosshair(asset_server: &Res<AssetServer>, materials: &mut ResMut<Assets<ColorMaterial>>, commands: &mut Commands) {
