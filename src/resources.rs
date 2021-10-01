@@ -38,10 +38,3 @@ impl Image {
         return Image { texture_atlas_index, image_index };
     }
 }
-
-pub(crate) struct TerrainType {
-    pub(crate) id: u8, // 0-255
-    pub(crate) population: u8,
-    pub(crate) production: u8,
-    pub(crate) gold: u8,
-}
