@@ -2,6 +2,7 @@ use bevy::{prelude::*, input::system::exit_on_esc_system};
 //use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use rand::{Rng, thread_rng};
 use resources::ScreenSize;
+use units::UnitPlugin;
 
 use crate::constants::{UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE};
 
@@ -43,11 +44,7 @@ fn main() {
         .add_system(exit_on_esc_system.system())
         .add_system(systems::move_camera::move_camera_system.system())
         //.add_system(zoom_camera.system())
-        .add_system(systems::unit_systems::select_unit_system.system())
-        .add_system(systems::unit_systems::check_for_unit_movement_system.system())
-        .add_system(systems::unit_systems::check_for_unit_selection_system.system())
-        .add_system(systems::unit_systems::check_for_unit_unselection_system.system())
-        .add_system(systems::unit_systems::move_unit_system.system())
+        .add_plugin(UnitPlugin)
         .run();
 }
 
@@ -76,13 +73,13 @@ fn setup_system(
     let hex = world_map::convert_index_to_axial(index.into(), world_map.width);
     // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
     
-    units::spawn_unit(&mut commands, &images, hex, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE, true, false);
+    units::spawn_unit(&mut commands, &images, hex, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE, true);
 
     let index = 1;
     let hex = world_map::convert_index_to_axial(index.into(), world_map.width);
     // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
     
-    units::spawn_unit(&mut commands, &images, hex, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE, false, false);
+    units::spawn_unit(&mut commands, &images, hex, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE, false);
 
     //draw_crosshair(&asset_server, &mut materials, &mut commands);
 

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use bevy::{prelude::*, render::camera::Camera};
 
-use crate::constants::{HALF, LAYOUT_SIZE, SCALE, UNIT_FRAME_ACTIVE, UNIT_FRAME_INACTIVE, UNIT_MOVEMENT_SPEED};
+use crate::constants::{HALF, LAYOUT_SIZE, SCALE, UNIT_FRAME_ACTIVE, UNIT_FRAME_HOVERED, UNIT_FRAME_INACTIVE, UNIT_MOVEMENT_SPEED};
 use crate::components::{IsMoving, MainCameraTag, SelectedTag, ToBeSelectedTag, Unit, UnitBadge};
 use crate::hexagons::{Hex, Point};
 use crate::resources::{ScreenSize, WorldMap};
@@ -51,9 +51,7 @@ pub(crate) fn check_for_unit_movement_system(
         let camera_transform = camera_query.single_mut().unwrap();
 
         for (entity, unit) in query.iter() {
-            let value = get_hex_clicked_on(&windows, &screen_size, camera_transform);
-
-            if let Some(hex) = value {
+            if let Some(hex) = get_hex_clicked_on(&windows, &screen_size, camera_transform) {
                 let neighbors = unit.location_hex.all_hex_neighbors();
 
                 for item in neighbors {
@@ -68,7 +66,6 @@ pub(crate) fn check_for_unit_movement_system(
                 }
             }
         }
-
     }
 }
 
@@ -88,9 +85,7 @@ pub(crate) fn check_for_unit_selection_system(
         let camera_transform = camera_query.single_mut().unwrap();
 
         for (entity, unit) in unit_query.iter() {
-            let value = get_hex_clicked_on(&windows, &screen_size, camera_transform);
-
-            if let Some(hex) = value {
+            if let Some(hex) = get_hex_clicked_on(&windows, &screen_size, camera_transform) {
                 if unit.location_hex == hex {
                     commands.entity(entity).insert(ToBeSelectedTag);
                 }
@@ -105,7 +100,7 @@ pub(crate) fn check_for_unit_unselection_system(
     images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
     mouse_input: Res<Input<MouseButton>>,
     windows: Res<Windows>,
-    unit_query: Query<(Entity, &Unit, &UnitBadge), (With<SelectedTag>, Without<IsMoving>)>,
+    unit_query: Query<(Entity, &Unit, &UnitBadge), (With<SelectedTag>)>,
     mut color_material_query: Query<&mut Handle<ColorMaterial>>,
     mut camera_query: Query<&Transform, (With<Camera>, With<MainCameraTag>)>
 ) {
@@ -117,7 +112,6 @@ pub(crate) fn check_for_unit_unselection_system(
         let camera_transform = camera_query.single_mut().unwrap();
 
         for (entity, unit, unit_badge) in unit_query.iter() {
-
             if let Some(hex) = get_hex_clicked_on(&windows, &screen_size, camera_transform) {
                 if unit.location_hex != hex {
                     // change unit to inactive
@@ -126,10 +120,35 @@ pub(crate) fn check_for_unit_unselection_system(
                     commands.entity(entity).remove::<SelectedTag>();
                 }
             }
-
         }
     }
 
+}
+
+pub(crate) fn check_for_unit_hover_system(
+    images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
+    screen_size: Res<ScreenSize>,
+    windows: Res<Windows>,
+    unit_query: Query<(&Unit, &UnitBadge), (Without<SelectedTag>, Without<IsMoving>)>,
+    mut color_material_query: Query<&mut Handle<ColorMaterial>>,
+    mut camera_query: Query<&Transform, (With<Camera>, With<MainCameraTag>)>
+) {
+    // if a unit is unselected and mouse cursor is in the hex of the unit
+    // then set unit's badge to hovering
+
+    let camera_transform = camera_query.single_mut().unwrap();
+
+    for (unit, unit_badge) in unit_query.iter() {
+        if let Some(hex) = get_hex_clicked_on(&windows, &screen_size, camera_transform) {
+            if unit.location_hex == hex {
+                // change unit to hovered
+                change_unit_frame(&mut color_material_query, unit_badge, &images, UNIT_FRAME_HOVERED);
+            } else {
+                // change unit to inactive
+                change_unit_frame(&mut color_material_query, unit_badge, &images, UNIT_FRAME_INACTIVE);
+            }
+        }
+    }
 }
 
 pub(crate) fn move_unit_system(

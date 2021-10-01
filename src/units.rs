@@ -5,6 +5,21 @@ use crate::constants::{BACKDROP_GREEN, BACKLIGHT, HALF, LAYOUT_SIZE, SCALE, UNIT
 use crate::create_bundles::create_sprite_bundle;
 use crate::components::{SelectedTag, ToBeSelectedTag, Unit, UnitBadge};
 use crate::hexagons::Hex;
+use crate::systems;
+
+pub(crate) struct UnitPlugin;
+impl Plugin for UnitPlugin {
+    fn build(&self, app: &mut AppBuilder) {
+        app
+        .add_system(systems::unit_systems::select_unit_system.system())
+        .add_system(systems::unit_systems::check_for_unit_movement_system.system())
+        .add_system(systems::unit_systems::check_for_unit_selection_system.system())
+        .add_system(systems::unit_systems::check_for_unit_unselection_system.system())
+        .add_system(systems::unit_systems::check_for_unit_hover_system.system())
+        .add_system(systems::unit_systems::move_unit_system.system());
+    }
+}
+
 
 pub(crate) fn spawn_unit(
     commands: &mut Commands,
@@ -12,8 +27,7 @@ pub(crate) fn spawn_unit(
     location_hex: Hex,
     image_id: u8,
     unit_status_image_id: u8, // 6-inactive, 7-hovered, 8-active
-    as_to_be_selected: bool,
-    as_selected: bool
+    as_to_be_selected: bool
 ) {
     // spawns a unit composition entity into the ECS
 
@@ -56,16 +70,6 @@ pub(crate) fn spawn_unit(
                 .push_children(&[backdrop, backlight, unit_type, hp_fill, frame])
                 .insert(Unit::new(1, location_hex))
                 .insert(ToBeSelectedTag);
-
-                return;
-        }
-
-        if as_selected {
-            commands
-                .spawn_bundle((Transform::from_translation(position), GlobalTransform::identity(), UnitBadge { backdrop, backlight, unit_type, hp_fill, frame }))
-                .push_children(&[backdrop, backlight, unit_type, hp_fill, frame])
-                .insert(Unit::new(1, location_hex))
-                .insert(SelectedTag);
 
                 return;
         }
