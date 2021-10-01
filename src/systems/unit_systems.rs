@@ -51,17 +51,19 @@ pub(crate) fn check_for_unit_movement_system(
         let camera_transform = camera_query.single_mut().unwrap();
 
         for (entity, unit) in query.iter() {
-            if let Some(hex) = get_hex_clicked_on(&windows, &screen_size, camera_transform) {
-                let neighbors = unit.location_hex.all_hex_neighbors();
-
-                for item in neighbors {
-                    if item == hex {
-                        let off_map = check_if_off_map(hex, world_map.width, world_map.height);
-                        if off_map { break; }
+            if unit.movement_points >= 1.0 {
+                if let Some(hex) = get_hex_clicked_on(&windows, &screen_size, camera_transform) {
+                    let neighbors = unit.location_hex.all_hex_neighbors();
     
-                        let is_moving = IsMoving::new(hex);
-                        commands.entity(entity).insert(is_moving);
-                        break;
+                    for item in neighbors {
+                        if item == hex {
+                            let off_map = check_if_off_map(hex, world_map.width, world_map.height);
+                            if off_map { break; }
+        
+                            let is_moving = IsMoving::new(hex);
+                            commands.entity(entity).insert(is_moving);
+                            break;
+                        }
                     }
                 }
             }
@@ -100,7 +102,7 @@ pub(crate) fn check_for_unit_unselection_system(
     images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
     mouse_input: Res<Input<MouseButton>>,
     windows: Res<Windows>,
-    unit_query: Query<(Entity, &Unit, &UnitBadge), (With<SelectedTag>)>,
+    unit_query: Query<(Entity, &Unit, &UnitBadge), With<SelectedTag>>,
     mut color_material_query: Query<&mut Handle<ColorMaterial>>,
     mut camera_query: Query<&Transform, (With<Camera>, With<MainCameraTag>)>
 ) {
@@ -171,6 +173,8 @@ pub(crate) fn move_unit_system(
         unit_translation.x += direction.x * time.delta_seconds();
         unit_translation.y += direction.y * time.delta_seconds();
 
+        // TODO: if unit badge is off screen, move camera to keep unit on screen
+
         let current_point = Point::new(unit_translation.x.into(), unit_translation.y.into());
         let arrived_at_destination = arrived_at_destination(current_point, desintation_point, direction);
         if arrived_at_destination {
@@ -179,8 +183,7 @@ pub(crate) fn move_unit_system(
             unit_translation.x = desintation_point.x as f32;
             unit_translation.y = desintation_point.y as f32;
 
-            // TODO: if unit badge is off screen, focus camera on unit
-            // TODO: subtract movement_points
+            unit.movement_points -= 1.0;
         }
 
     }
