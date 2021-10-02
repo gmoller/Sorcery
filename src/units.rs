@@ -1,9 +1,9 @@
 use std::collections;
 use bevy::prelude::*;
 
-use crate::constants::{BACKDROP_GREEN, BACKLIGHT, HALF, LAYOUT_SIZE, SCALE, UNIT_HP_FILL};
+use crate::constants::{BACKDROP_GREEN, BACKLIGHT, HALF, HEX_SIZE, LAYOUT_SIZE, SCALE, UNIT_HP_FILL};
 use crate::create_bundles::create_sprite_bundle;
-use crate::components::{SelectedTag, ToBeSelectedTag, Unit, UnitBadge};
+use crate::components::{ToBeSelectedTag, Unit, UnitBadge};
 use crate::hexagons::Hex;
 use crate::systems;
 
@@ -36,7 +36,7 @@ pub(crate) fn spawn_unit(
     let value = images.get(&(6)); // 6: Units
     if let Some(texture_atlas) = value {
 
-        let sprite_dimensions = Vec2::new(256.0 * HALF, 256.0 * HALF);
+        let sprite_dimensions = Vec2::new(HEX_SIZE.0 * HALF, HEX_SIZE.1 * HALF);
         let sprite_scale = Vec3::new(SCALE.0 as f32, SCALE.1 as f32, 1.0);
         let position = Vec3::new(world_position.x as f32, world_position.y as f32, 10.0);
 
@@ -48,16 +48,16 @@ pub(crate) fn spawn_unit(
         let color_material_handle_unit_hp_fill = texture_atlas[UNIT_HP_FILL as usize].clone();
         let color_material_handle_unit_frame = texture_atlas[unit_status_image_id as usize].clone();
 
-        let backdrop_bundle = create_sprite_bundle(Vec2::new(104.0, 104.0), Vec3::new(0.0, 0.0, -3.0), sprite_scale, color_material_handle_backdrop);
+        let backdrop_bundle = create_sprite_bundle(Vec2::new(HEX_SIZE.0 * 0.41, HEX_SIZE.1 * 0.41), Vec3::new(0.0, 0.0, -3.0), sprite_scale, color_material_handle_backdrop);
         let backdrop = commands.spawn_bundle(backdrop_bundle).id();
 
-        let backlight_bundle = create_sprite_bundle(Vec2::new(104.0, 104.0), Vec3::new(0.0, 0.0, -2.0), sprite_scale, color_material_handle_backlight);
+        let backlight_bundle = create_sprite_bundle(Vec2::new(HEX_SIZE.0 * 0.41, HEX_SIZE.1 * 0.41), Vec3::new(0.0, 0.0, -2.0), sprite_scale, color_material_handle_backlight);
         let backlight = commands.spawn_bundle(backlight_bundle).id();
 
-        let unit_type_bundle = create_sprite_bundle(Vec2::new(72.0, 64.0), Vec3::new(0.0, 6.0, -1.0), sprite_scale, color_material_handle_unit_type);
+        let unit_type_bundle = create_sprite_bundle(Vec2::new(HEX_SIZE.0 * 0.28, HEX_SIZE.1 * 0.25), Vec3::new(0.0, HEX_SIZE.1 * 0.023, -1.0), sprite_scale, color_material_handle_unit_type);
         let unit_type = commands.spawn_bundle(unit_type_bundle).id();
 
-        let hp_fill_bundle = create_sprite_bundle(Vec2::new(80.0, 12.0), Vec3::new(0.0, -38.0, -1.0), sprite_scale, color_material_handle_unit_hp_fill);
+        let hp_fill_bundle = create_sprite_bundle(Vec2::new(HEX_SIZE.0 * 0.31, HEX_SIZE.1 * 0.05), Vec3::new(0.0, -HEX_SIZE.1 * 0.15, -1.0), sprite_scale, color_material_handle_unit_hp_fill);
         let hp_fill = commands.spawn_bundle(hp_fill_bundle).id();
 
         let frame_bundle = create_sprite_bundle(sprite_dimensions, Vec3::default(), sprite_scale, color_material_handle_unit_frame);

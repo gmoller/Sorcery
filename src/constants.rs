@@ -3,12 +3,12 @@ pub(crate) const SCALE: (f32, f32) = (1.0, 1.0);
 
 pub(crate) const UNIT_MOVEMENT_SPEED: f32 = 400.0 * SCALE.0;
 
-//pub(crate) const HEX_SIZE: (f32, f32) = (32.0, 48.0);
-//pub(crate) const HEX_SIZE: (f32, f32) = (64.0, 96.0);
-//pub(crate) const HEX_SIZE: (f32, f32) = (128.0, 192.0);
-pub(crate) const HEX_SIZE: (f32, f32) = (256.0, 384.0);
-pub(crate) const HEX_OFFSET_Y: f32 = HEX_SIZE.1 / 6.0;
-pub(crate) const LAYOUT_SIZE: (f32, f32) = (HEX_SIZE.0 * 0.57421875, HEX_SIZE.1 * 0.3351);
+//pub(crate) const HEX_SIZE: (f32, f32) = (32.0, 32.0);
+//pub(crate) const HEX_SIZE: (f32, f32) = (64.0, 64.0);
+//pub(crate) const HEX_SIZE: (f32, f32) = (128.0, 128.0);
+pub(crate) const HEX_SIZE: (f32, f32) = (256.0, 256.0);
+pub(crate) const HEX_EXTRA_Y: f32 = HEX_SIZE.1 * HALF;
+pub(crate) const LAYOUT_SIZE: (f32, f32) = (HEX_SIZE.0 * 0.57421875, (HEX_SIZE.1 + HEX_EXTRA_Y) * 0.3351);
 
 pub(crate) const UNIT_FRAME_INACTIVE: u8 = 0;
 pub(crate) const UNIT_FRAME_HOVERED: u8 = 1;

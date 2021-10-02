@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 use bevy::prelude::*;
 
-use crate::constants::{HEX_OFFSET_Y, HEX_SIZE, LAYOUT_SIZE, SCALE};
+//use crate::constants::{HEX_OFFSET_Y, HEX_SIZE, LAYOUT_SIZE, SCALE};
+use crate::constants::{HALF, HEX_EXTRA_Y, HEX_SIZE, LAYOUT_SIZE, SCALE};
 use crate::hexagons::*;
 use crate::resources::WorldMap;
 
@@ -9,7 +10,7 @@ pub(crate) fn spawn_map(commands: &mut Commands, world_map: &WorldMap, images: &
     // spawns the map into the ECS
 
     let scale = Vec3::new(SCALE.0, SCALE.1, 1.0);
-    let size = Vec2::new(HEX_SIZE.0, HEX_SIZE.1);
+    let size = Vec2::new(HEX_SIZE.0, HEX_SIZE.1 + HEX_EXTRA_Y);
 
     for row in 0..world_map.height {
         for column in 0..world_map.width {
@@ -37,7 +38,7 @@ fn create_tile(commands: &mut Commands, index: i32, world_map: &WorldMap, terrai
 
     let axial = convert_index_to_axial(index, world_map.width); // convert index to axial
     let world_position = axial.hex_to_pixel(LAYOUT_SIZE, SCALE); // calculate world position from axial
-    let position = Vec3::new(world_position.x as f32, world_position.y as f32 + HEX_OFFSET_Y * SCALE.1, (index as f32) / 1000.0);
+    let position = Vec3::new(world_position.x as f32, world_position.y as f32 + HEX_EXTRA_Y * HALF * SCALE.1, (index as f32) / 1000.0);
     let image_index: usize = terrain_image.image_index.into();
     let image = texture_atlas[image_index].clone();
     let bundle = crate::create_bundles::create_sprite_bundle(size, position, scale, image);
