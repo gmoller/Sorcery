@@ -76,13 +76,13 @@ fn setup_system(
     // create unit on random location
     let mut rng = thread_rng();
     let index = rng.gen_range(0..world_map.width * world_map.height);
-    let index = 0;
+    let index = 60;
     let hex = world_map::convert_index_to_axial(index.into(), world_map.width);
     // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
     
     units::spawn_unit(&mut commands, &images, hex, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE, true);
 
-    let index = 1;
+    let index = 61;
     let hex = world_map::convert_index_to_axial(index.into(), world_map.width);
     // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
     
