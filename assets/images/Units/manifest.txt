@@ -2,7 +2,6 @@ unit_frame_inactive.png
 unit_frame_hovered.png
 unit_frame_active.png
 unit_hp_fill.png
-Unit_Icon_BarbarianSpearmen_Transparent.png
 backlight.png
 backdrop_black.png
 backdrop_brown.png
@@ -20,3 +19,6 @@ backdrop_rose.png
 backdrop_turquoise.png
 backdrop_white.png
 backdrop_yellow.png
+Unit_Icon_Settlers_Transparent.png
+Unit_Icon_BarbarianSpearmen_Transparent.png
+Unit_Icon_BarbarianSwordsmen_Transparent.png

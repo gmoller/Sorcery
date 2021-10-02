@@ -1,17 +1,18 @@
 use bevy::{prelude::*, input::system::exit_on_esc_system};
 //use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
-use rand::{Rng, thread_rng};
+//use rand::{Rng, thread_rng};
 
 use resources::ScreenSize;
 use units::UnitPlugin;
 
 use crate::config::terrain::load_terrain_types;
-use crate::constants::{UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE};
+use crate::config::units::load_unit_types;
 
 mod assets;
 mod components;
 mod config {
     pub(crate) mod terrain;
+    pub(crate) mod units;
 }
 mod constants;
 mod create_bundles;
@@ -74,19 +75,19 @@ fn setup_system(
     world_map::spawn_map(&mut commands, &world_map, &images);
 
     // create unit on random location
-    let mut rng = thread_rng();
-    let index = rng.gen_range(0..world_map.width * world_map.height);
+    //let mut rng = thread_rng();
+    //let index = rng.gen_range(0..world_map.width * world_map.height);
     let index = 60;
     let hex = world_map::convert_index_to_axial(index.into(), world_map.width);
     // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
     
-    units::spawn_unit(&mut commands, &images, hex, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE, true);
+    units::spawn_unit(&mut commands, &images, hex, 1, true);
 
     let index = 61;
     let hex = world_map::convert_index_to_axial(index.into(), world_map.width);
     // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
     
-    units::spawn_unit(&mut commands, &images, hex, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_FRAME_INACTIVE, false);
+    units::spawn_unit(&mut commands, &images, hex, 2, false);
 
     //draw_crosshair(&asset_server, &mut materials, &mut commands);
 
@@ -100,8 +101,9 @@ fn setup_system(
 }
 
 fn load_config(commands: &mut Commands) {
-    let terrain_types = load_terrain_types();
-    commands.insert_resource(terrain_types);
+    
+    commands.insert_resource(load_terrain_types());
+    commands.insert_resource(load_unit_types());
 }
 
 // fn draw_crosshair(asset_server: &Res<AssetServer>, materials: &mut ResMut<Assets<ColorMaterial>>, commands: &mut Commands) {

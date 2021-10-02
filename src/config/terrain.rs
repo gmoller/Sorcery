@@ -3,7 +3,7 @@ use std::collections::HashMap;
 struct TerrainType {
     id: u8,         // 0-255
     name: String,
-    population: f32, // 0-255
+    population: f32,
     // production: u8, // 0-255
     // gold: u8,       // 0-255
     // movement_point_cost_walking: u8,

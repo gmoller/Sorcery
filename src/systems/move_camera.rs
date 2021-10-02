@@ -34,11 +34,9 @@ pub(crate) fn move_camera_system(
         }
     }
 
-    //camera_transform.translation.x = camera_transform.translation.x.clamp(0.0, 15000.0);
-    //camera_transform.translation.y = camera_transform.translation.y.clamp(-7500.0, 0.0);
     camera_transform.translation.x = camera_transform.translation.x.clamp(950.0, 15360.0 - 950.0);
     camera_transform.translation.y = camera_transform.translation.y.clamp(-7500.0, -450.0);
 
-    println!("Camera coords: {}/{}", camera_transform.translation.x, camera_transform.translation.y);
+    //println!("Camera coords: {}/{}", camera_transform.translation.x, camera_transform.translation.y);
 
 }
