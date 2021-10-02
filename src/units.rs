@@ -3,11 +3,12 @@ use bevy::prelude::*;
 
 use crate::constants::{BACKDROP_INDIGO, BACKLIGHT, HALF, HEX_SIZE, LAYOUT_SIZE, SCALE, UNIT_FRAME_INACTIVE, UNIT_HP_FILL, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_ICON_BARBARIAN_SWORDSMEN_TRANSPARENT, UNIT_ICON_SETTLERS_TRANSPARENT};
 use crate::create_bundles::create_sprite_bundle;
+use crate::config::units::UnitTypes;
 use crate::components::{ToBeSelectedTag, Unit, UnitBadge};
 use crate::hexagons::Hex;
 use crate::systems;
 
-pub(crate) struct UnitPlugin;
+pub struct UnitPlugin;
 impl Plugin for UnitPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app
@@ -20,23 +21,20 @@ impl Plugin for UnitPlugin {
     }
 }
 
-pub(crate) fn spawn_unit(
+pub fn spawn_unit(
     commands: &mut Commands,
     images: &collections::HashMap<i32, Vec<Handle<ColorMaterial>>>,
+    unit_types: &UnitTypes,
     location_hex: Hex,
-    unit_type_id: u8,
+    unit_type_id: u16,
     as_to_be_selected: bool
 ) {
     // spawns a unit composition entity into the ECS
     // TODO: make this a system
 
-    let image_id = match unit_type_id {
-        0 => 0,
-        1 => UNIT_ICON_SETTLERS_TRANSPARENT,
-        2 => UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT,
-        3 => UNIT_ICON_BARBARIAN_SWORDSMEN_TRANSPARENT,
-        4..=u8::MAX => 4
-    };
+    let unit_type = unit_types.get_by_id(unit_type_id);
+    let image_id = unit_type.image_id;
+    let movement_points = unit_type.moves;
 
     let world_position = location_hex.hex_to_pixel(LAYOUT_SIZE, SCALE); // calculate world position from hex
 
@@ -70,21 +68,17 @@ pub(crate) fn spawn_unit(
         let frame_bundle = create_sprite_bundle(sprite_dimensions, Vec3::default(), sprite_scale, color_material_handle_unit_frame);
         let frame = commands.spawn_bundle(frame_bundle).id();
 
+        let unit = Unit::new(unit_type_id, location_hex, movement_points);
+
         // root entity holding everything together
-        if as_to_be_selected {
-            commands
-                .spawn_bundle((Transform::from_translation(position), GlobalTransform::identity(), UnitBadge { backdrop, backlight, unit_type, hp_fill, frame }))
-                .push_children(&[backdrop, backlight, unit_type, hp_fill, frame])
-                .insert(Unit::new(1, location_hex))
-                .insert(ToBeSelectedTag);
-
-                return;
-        }
-
-        commands
+        let entity = commands
             .spawn_bundle((Transform::from_translation(position), GlobalTransform::identity(), UnitBadge { backdrop, backlight, unit_type, hp_fill, frame }))
             .push_children(&[backdrop, backlight, unit_type, hp_fill, frame])
-            .insert(Unit::new(1, location_hex));
+            .insert(unit).id();
+
+        if as_to_be_selected {
+            commands.entity(entity).insert(ToBeSelectedTag);
+        }
 
     }
 

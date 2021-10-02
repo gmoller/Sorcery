@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-struct TerrainType {
+pub struct TerrainType {
     id: u8,         // 0-255
     name: String,
     population: f32,
@@ -15,8 +15,31 @@ struct TerrainType {
     // movement_point_cost_pathfinding: u8
 }
 
-pub(crate) struct TerrainTypes {
+pub struct TerrainTypes {
     map: HashMap<u8, TerrainType>
+}
+impl TerrainTypes {
+    pub fn get_by_id(&self, terrain_type_id: u8) -> &TerrainType {
+        let tt = self.map.get(&terrain_type_id);
+        let result = match tt {
+            None => panic!("Terrain type with id [{}] not found", terrain_type_id),
+            Some(terrain_type) => terrain_type
+        };
+
+        return result;
+    }
+    pub fn clone(&self) -> TerrainTypes {
+        let mut map = HashMap::new();
+        for item in &self.map {
+            let key = item.0.clone();
+            let value = TerrainType { id: item.1.id, name: item.1.name.clone(), population: item.1.population };
+            map.insert(key, value);
+        }
+
+        let result = TerrainTypes { map };
+
+        return result;
+    }
 }
 
 fn instantiate_terrain_type(id: u8, name: String, population: f32) -> TerrainType {
@@ -29,7 +52,7 @@ fn instantiate_terrain_type(id: u8, name: String, population: f32) -> TerrainTyp
     return result;
 }
 
-pub(crate) fn load_terrain_types() -> TerrainTypes {
+pub fn load_terrain_types() -> TerrainTypes {
     let mut terrain_types = HashMap::new();
 
     terrain_types.insert( 1, instantiate_terrain_type( 1, String::from("Ocean Iceberg"), 0.0));

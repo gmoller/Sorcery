@@ -69,7 +69,10 @@ fn setup_system(
 
     let images = assets::load_images(&asset_server, &mut materials);
 
-    load_config(&mut commands);
+    let terrain_types = load_terrain_types();
+    commands.insert_resource(terrain_types.clone());
+    let unit_types = load_unit_types();
+    commands.insert_resource(unit_types.clone());
 
     let world_map = world_map_generator::create_map(60, 40);
     world_map::spawn_map(&mut commands, &world_map, &images);
@@ -81,13 +84,13 @@ fn setup_system(
     let hex = world_map::convert_index_to_axial(index.into(), world_map.width);
     // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
     
-    units::spawn_unit(&mut commands, &images, hex, 1, true);
+    units::spawn_unit(&mut commands, &images, &unit_types, hex, 1, true);
 
     let index = 61;
     let hex = world_map::convert_index_to_axial(index.into(), world_map.width);
     // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
     
-    units::spawn_unit(&mut commands, &images, hex, 2, false);
+    units::spawn_unit(&mut commands, &images, &unit_types, hex, 2, false);
 
     //draw_crosshair(&asset_server, &mut materials, &mut commands);
 
@@ -98,12 +101,6 @@ fn setup_system(
     commands.insert_resource(world_map);
     commands.insert_resource(screen_size);
 
-}
-
-fn load_config(commands: &mut Commands) {
-    
-    commands.insert_resource(load_terrain_types());
-    commands.insert_resource(load_unit_types());
 }
 
 // fn draw_crosshair(asset_server: &Res<AssetServer>, materials: &mut ResMut<Assets<ColorMaterial>>, commands: &mut Commands) {
