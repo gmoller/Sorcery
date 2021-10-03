@@ -42,11 +42,11 @@ pub struct UnitBadge {
     pub frame: Entity
 }
 
-pub struct OwnedByRace {
-    pub race_type_id: u8
+pub struct OwnedByWizard {
+    pub wizard_id: u8
 }
-impl OwnedByRace {
-    pub fn new(race_type_id: u8) -> OwnedByRace {
-        return OwnedByRace { race_type_id };
+impl OwnedByWizard {
+    pub fn new(wizard_id: u8) -> OwnedByWizard {
+        return OwnedByWizard { wizard_id };
     }
 }

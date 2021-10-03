@@ -1,10 +1,10 @@
 use std::collections;
 use bevy::prelude::*;
 
-use crate::constants::{BACKDROP_GREEN, BACKDROP_INDIGO, BACKDROP_RED, BACKLIGHT, HALF, HEX_SIZE, LAYOUT_SIZE, SCALE, UNIT_FRAME_INACTIVE, UNIT_HP_FILL, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_ICON_BARBARIAN_SWORDSMEN_TRANSPARENT, UNIT_ICON_SETTLERS_TRANSPARENT};
+use crate::constants::{BACKDROP_GREEN, BACKDROP_INDIGO, BACKDROP_RED, BACKLIGHT, HALF, HEX_SIZE, LAYOUT_SIZE, SCALE, UNIT_FRAME_INACTIVE, UNIT_HP_FILL};
 use crate::create_bundles::create_sprite_bundle;
 use crate::config::units::UnitTypes;
-use crate::components::{OwnedByRace, ToBeSelectedTag, Unit, UnitBadge};
+use crate::components::{OwnedByWizard, ToBeSelectedTag, Unit, UnitBadge};
 use crate::hexagons::Hex;
 use crate::systems;
 
@@ -84,7 +84,7 @@ pub fn spawn_unit(
             .spawn_bundle((Transform::from_translation(position), GlobalTransform::identity(), UnitBadge { backdrop, backlight, unit_type, hp_fill, frame }))
             .push_children(&[backdrop, backlight, unit_type, hp_fill, frame])
             .insert(unit)
-            .insert(OwnedByRace::new(race_type_id))
+            .insert(OwnedByWizard::new(race_type_id))
             .id();
 
         if as_to_be_selected {
