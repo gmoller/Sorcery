@@ -41,3 +41,12 @@ pub struct UnitBadge {
     pub hp_fill: Entity,
     pub frame: Entity
 }
+
+pub struct OwnedByRace {
+    pub race_type_id: u8
+}
+impl OwnedByRace {
+    pub fn new(race_type_id: u8) -> OwnedByRace {
+        return OwnedByRace { race_type_id };
+    }
+}

@@ -1,10 +1,10 @@
 use std::collections;
 use bevy::prelude::*;
 
-use crate::constants::{BACKDROP_INDIGO, BACKLIGHT, HALF, HEX_SIZE, LAYOUT_SIZE, SCALE, UNIT_FRAME_INACTIVE, UNIT_HP_FILL, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_ICON_BARBARIAN_SWORDSMEN_TRANSPARENT, UNIT_ICON_SETTLERS_TRANSPARENT};
+use crate::constants::{BACKDROP_GREEN, BACKDROP_INDIGO, BACKDROP_RED, BACKLIGHT, HALF, HEX_SIZE, LAYOUT_SIZE, SCALE, UNIT_FRAME_INACTIVE, UNIT_HP_FILL, UNIT_ICON_BARBARIAN_SPEARMEN_TRANSPARENT, UNIT_ICON_BARBARIAN_SWORDSMEN_TRANSPARENT, UNIT_ICON_SETTLERS_TRANSPARENT};
 use crate::create_bundles::create_sprite_bundle;
 use crate::config::units::UnitTypes;
-use crate::components::{ToBeSelectedTag, Unit, UnitBadge};
+use crate::components::{OwnedByRace, ToBeSelectedTag, Unit, UnitBadge};
 use crate::hexagons::Hex;
 use crate::systems;
 
@@ -27,6 +27,7 @@ pub fn spawn_unit(
     unit_types: &UnitTypes,
     location_hex: Hex,
     unit_type_id: u16,
+    race_type_id: u8,
     as_to_be_selected: bool
 ) {
     // spawns a unit composition entity into the ECS
@@ -35,6 +36,14 @@ pub fn spawn_unit(
     let unit_type = unit_types.get_by_id(unit_type_id);
     let image_id = unit_type.image_id;
     let movement_points = unit_type.moves;
+
+    let backdrop_material_id = match race_type_id {
+        0 => panic!("Oh noes!"),
+        1 => BACKDROP_INDIGO,
+        2 => BACKDROP_RED,
+        3 => BACKDROP_GREEN,
+        4..=u8::MAX => panic!("Oh noes!")
+    };
 
     let world_position = location_hex.hex_to_pixel(LAYOUT_SIZE, SCALE); // calculate world position from hex
 
@@ -45,7 +54,7 @@ pub fn spawn_unit(
         let sprite_scale = Vec3::new(SCALE.0 as f32, SCALE.1 as f32, 1.0);
         let position = Vec3::new(world_position.x as f32, world_position.y as f32, 10.0);
 
-        let color_material_handle_backdrop = texture_atlas[BACKDROP_INDIGO as usize].clone();
+        let color_material_handle_backdrop = texture_atlas[backdrop_material_id as usize].clone();
         //let color = &mut materials.get_mut(&color_material_handle_backdrop).unwrap().color;
         //color.set_r(0.0); //color.set_g(1.0); //color.set_b(0.0);
         let color_material_handle_backlight = texture_atlas[BACKLIGHT as usize].clone();
@@ -74,7 +83,9 @@ pub fn spawn_unit(
         let entity = commands
             .spawn_bundle((Transform::from_translation(position), GlobalTransform::identity(), UnitBadge { backdrop, backlight, unit_type, hp_fill, frame }))
             .push_children(&[backdrop, backlight, unit_type, hp_fill, frame])
-            .insert(unit).id();
+            .insert(unit)
+            .insert(OwnedByRace::new(race_type_id))
+            .id();
 
         if as_to_be_selected {
             commands.entity(entity).insert(ToBeSelectedTag);

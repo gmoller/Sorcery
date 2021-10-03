@@ -69,10 +69,7 @@ fn setup_system(
 
     let images = assets::load_images(&asset_server, &mut materials);
 
-    let terrain_types = load_terrain_types();
-    commands.insert_resource(terrain_types.clone());
-    let unit_types = load_unit_types();
-    commands.insert_resource(unit_types.clone());
+    let unit_types = load_config(&mut commands);
 
     let world_map = world_map_generator::create_map(60, 40);
     world_map::spawn_map(&mut commands, &world_map, &images);
@@ -80,17 +77,15 @@ fn setup_system(
     // create unit on random location
     //let mut rng = thread_rng();
     //let index = rng.gen_range(0..world_map.width * world_map.height);
+
     let index = 60;
-    let hex = world_map::convert_index_to_axial(index.into(), world_map.width);
-    // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
-    
-    units::spawn_unit(&mut commands, &images, &unit_types, hex, 1, true);
+    spawn_unit(&mut commands, &world_map, &images, &unit_types, index, 1, true);
 
     let index = 61;
-    let hex = world_map::convert_index_to_axial(index.into(), world_map.width);
-    // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
-    
-    units::spawn_unit(&mut commands, &images, &unit_types, hex, 2, false);
+    spawn_unit(&mut commands, &world_map, &images, &unit_types, index, 1, false);
+
+    let index = 62;
+    spawn_unit(&mut commands, &world_map, &images, &unit_types, index, 2, false);
 
     //draw_crosshair(&asset_server, &mut materials, &mut commands);
 
@@ -101,6 +96,21 @@ fn setup_system(
     commands.insert_resource(world_map);
     commands.insert_resource(screen_size);
 
+}
+
+fn load_config(commands: &mut Commands) -> config::units::UnitTypes {
+    let terrain_types = load_terrain_types();
+    commands.insert_resource(terrain_types.clone());
+    let unit_types = load_unit_types();
+    commands.insert_resource(unit_types.clone());
+    
+    return unit_types;
+}
+
+fn spawn_unit(commands: &mut Commands, world_map: &resources::WorldMap, images: &std::collections::HashMap<i32, Vec<Handle<ColorMaterial>>>, unit_types: &config::units::UnitTypes, index: i32, race_type_id: u8, as_to_be_selected: bool) {
+    let hex = world_map::convert_index_to_axial(index, world_map.width);
+    // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
+    units::spawn_unit(commands, images, &unit_types, hex, 2, race_type_id, as_to_be_selected);
 }
 
 // fn draw_crosshair(asset_server: &Res<AssetServer>, materials: &mut ResMut<Assets<ColorMaterial>>, commands: &mut Commands) {
