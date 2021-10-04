@@ -1,6 +1,6 @@
-use bevy::prelude::Entity;
+use bevy::prelude::*;
 
-use crate::hexagons::Hex;
+use crate::{config::units::UnitTypes, hexagons::Hex};
 
 pub struct IsMoving {
     pub destination_hex: Hex // axial hex destination of moving unit
@@ -31,6 +31,11 @@ impl Unit {
         };
 
         return unit;
+    }
+    pub fn reset_movement_points(&mut self, unit_types: &Res<UnitTypes>) {
+
+        let unit_type = unit_types.get_by_id(self.unit_type_id);
+        self.movement_points = unit_type.moves;
     }
 }
 

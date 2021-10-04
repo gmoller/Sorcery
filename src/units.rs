@@ -6,20 +6,6 @@ use crate::create_bundles::create_sprite_bundle;
 use crate::config::units::UnitTypes;
 use crate::components::{OwnedByWizard, ToBeSelectedTag, Unit, UnitBadge};
 use crate::hexagons::Hex;
-use crate::systems;
-
-pub struct UnitPlugin;
-impl Plugin for UnitPlugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app
-        .add_system(systems::unit_systems::select_unit_system.system())
-        .add_system(systems::unit_systems::check_for_unit_movement_system.system())
-        .add_system(systems::unit_systems::check_for_unit_selection_system.system())
-        .add_system(systems::unit_systems::check_for_unit_unselection_system.system())
-        .add_system(systems::unit_systems::check_for_unit_hover_system.system())
-        .add_system(systems::unit_systems::move_unit_system.system());
-    }
-}
 
 pub fn spawn_unit(
     commands: &mut Commands,

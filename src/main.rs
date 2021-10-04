@@ -3,10 +3,10 @@ use bevy::{prelude::*, input::system::exit_on_esc_system};
 //use rand::{Rng, thread_rng};
 
 use resources::ScreenSize;
-use units::UnitPlugin;
 
 use crate::config::terrain::load_terrain_types;
 use crate::config::units::load_unit_types;
+use crate::enums::AppState;
 
 mod assets;
 mod components;
@@ -16,13 +16,17 @@ mod config {
 }
 mod constants;
 mod create_bundles;
+mod enums;
 mod hexagons;
 mod noise;
 mod resources;
 mod systems {
-    pub(crate) mod unit_systems;
-    pub(crate) mod move_camera;
-    pub(crate) mod zoom_camera;
+    pub mod move_camera;
+    pub mod npcs_turn;
+    pub mod start_new_turn;
+    pub mod player_turn;
+    pub mod unit_systems;
+    pub mod zoom_camera;
 }
 mod units;
 mod world_map;
@@ -46,11 +50,31 @@ fn main() {
         .add_plugins(DefaultPlugins)
         //.add_plugin(LogDiagnosticsPlugin::default())
         //.add_plugin(FrameTimeDiagnosticsPlugin::default())
+        .add_state(AppState::StartNewTurnState)
         .add_startup_system(setup_system.system())
         .add_system(exit_on_esc_system.system())
-        .add_system(systems::move_camera::move_camera_system.system())
+        
+        .add_system_set(SystemSet::on_update(AppState::StartNewTurnState).with_system(systems::start_new_turn::start_new_turn_update_system.system()))
+        .add_system_set(SystemSet::on_enter(AppState::StartNewTurnState).with_system(systems::start_new_turn::start_new_turn_enter_system.system()))
+        .add_system_set(SystemSet::on_exit(AppState::StartNewTurnState).with_system(systems::start_new_turn::start_new_turn_exit_system.system()))
+
+        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::move_camera::move_camera_system.system()))
+        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::select_unit_system.system()))
+        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::check_for_unit_unselection_system.system()))
+        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::check_for_unit_selection_system.system()))
+        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::check_for_unit_hover_system.system()))
+        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::check_for_unit_movement_system.system()))
+        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::move_unit_system.system()))
+        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::player_turn::check_for_end_turn_system.system()))
+        .add_system_set(SystemSet::on_enter(AppState::PlayerTurnState).with_system(systems::player_turn::player_turn_enter_system.system()))
+        .add_system_set(SystemSet::on_exit(AppState::PlayerTurnState).with_system(systems::player_turn::player_turn_exit_system.system()))
+
+        .add_system_set(SystemSet::on_update(AppState::NPCsTurnState).with_system(systems::npcs_turn::check_for_end_turn_system.system()))
+        .add_system_set(SystemSet::on_enter(AppState::NPCsTurnState).with_system(systems::npcs_turn::npcs_turn_enter_system.system()))
+        .add_system_set(SystemSet::on_exit(AppState::NPCsTurnState).with_system(systems::npcs_turn::npcs_turn_exit_system.system()))
+
         //.add_system(zoom_camera.system())
-        .add_plugin(UnitPlugin)
+
         .run();
 }
 
@@ -95,7 +119,6 @@ fn setup_system(
     commands.insert_resource(images);
     commands.insert_resource(world_map);
     commands.insert_resource(screen_size);
-
 }
 
 fn load_config(commands: &mut Commands) -> config::units::UnitTypes {

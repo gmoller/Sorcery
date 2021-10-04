@@ -2,7 +2,7 @@
 // use bevy::input::mouse::MouseWheel;
 // use bevy::render::camera::{Camera, OrthographicProjection};
 
-// pub(crate) fn zoom_camera(
+// pub fn zoom_camera(
 //     mut mouse_wheel_events: EventReader<MouseWheel>,
 //     windows: Res<Windows>,
 //     //mut query: Query<&mut Transform, With<Camera>>

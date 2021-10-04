@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy::input::{Input, mouse::MouseMotion};
 use bevy::render::camera::Camera;
 
-pub(crate) fn move_camera_system(
+pub fn move_camera_system(
     keyboard_input: Res<Input<KeyCode>>,
     mouse_input: Res<Input<MouseButton>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
