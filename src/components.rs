@@ -23,16 +23,17 @@ pub struct Unit {
     pub movement_points: f32
 }
 impl Unit {
-    pub fn new(unit_type_id: u16, location_hex: Hex, movement_points: f32) -> Unit {
-        let unit = Unit {
+    pub fn new(unit_type_id: u16, location_hex: Hex, unit_types: &UnitTypes) -> Unit {
+        let mut unit = Unit {
             unit_type_id,
             location_hex,
-            movement_points
+            movement_points: 0.0
         };
+        unit.reset_movement_points(&unit_types);
 
         return unit;
     }
-    pub fn reset_movement_points(&mut self, unit_types: &Res<UnitTypes>) {
+    pub fn reset_movement_points(&mut self, unit_types: &UnitTypes) {
 
         let unit_type = unit_types.get_by_id(self.unit_type_id);
         self.movement_points = unit_type.moves;
@@ -47,11 +48,13 @@ pub struct UnitBadge {
     pub frame: Entity
 }
 
-pub struct OwnedByWizard {
-    pub wizard_id: u8
+pub struct OwnedByFaction {
+    pub faction_id: u8
 }
-impl OwnedByWizard {
-    pub fn new(wizard_id: u8) -> OwnedByWizard {
-        return OwnedByWizard { wizard_id };
+impl OwnedByFaction {
+    pub fn new(faction_id: u8) -> OwnedByFaction {
+        return OwnedByFaction { faction_id };
     }
 }
+
+pub struct NeedsOrders;

@@ -2,14 +2,14 @@ use std::collections::HashMap;
 use bevy::{prelude::*, render::camera::Camera};
 
 use crate::constants::{HALF, LAYOUT_SIZE, SCALE, UNIT_FRAME_ACTIVE, UNIT_FRAME_HOVERED, UNIT_FRAME_INACTIVE, UNIT_MOVEMENT_SPEED};
-use crate::components::{IsMoving, MainCameraTag, OwnedByWizard, SelectedTag, ToBeSelectedTag, Unit, UnitBadge};
+use crate::components::{IsMoving, MainCameraTag, OwnedByFaction, SelectedTag, ToBeSelectedTag, Unit, UnitBadge};
 use crate::hexagons::{Hex, Point};
 use crate::resources::{ScreenSize, WorldMap};
 
 pub(crate) fn select_unit_system(
     mut commands: Commands,
     images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
-    mut unit_query: Query<(Entity, &Unit, &UnitBadge, &OwnedByWizard), With<ToBeSelectedTag>>,
+    mut unit_query: Query<(Entity, &Unit, &UnitBadge, &OwnedByFaction), With<ToBeSelectedTag>>,
     mut color_material_query: Query<&mut Handle<ColorMaterial>>,
     mut camera_query: Query<&mut Transform, (With<Camera>, With<MainCameraTag>)>
 ) {
@@ -17,9 +17,9 @@ pub(crate) fn select_unit_system(
 
     let mut camera_transform = camera_query.single_mut().unwrap();
 
-    for (entity, unit, unit_badge, owned_by_wizard) in unit_query.iter_mut() {
+    for (entity, unit, unit_badge, owned_by_faction) in unit_query.iter_mut() {
 
-        if owned_by_wizard.wizard_id != 1 { continue; }
+        if owned_by_faction.faction_id != 1 { continue; }
 
         // focus camera on unit
         let world_position = unit.location_hex.hex_to_pixel(LAYOUT_SIZE, SCALE); // calculate world position from hex
@@ -42,7 +42,7 @@ pub(crate) fn check_for_unit_movement_system(
     mouse_input: Res<Input<MouseButton>>,
     windows: Res<Windows>,
     world_map: Res<WorldMap>,
-    query: Query<(Entity, &Unit, &OwnedByWizard), (With<SelectedTag>, Without<IsMoving>)>,
+    query: Query<(Entity, &Unit, &OwnedByFaction), (With<SelectedTag>, Without<IsMoving>)>,
     mut camera_query: Query<&Transform, (With<Camera>, With<MainCameraTag>)>
 ) {
     // if a unit is selected and mouse right clicked in a neighbouring hex
@@ -52,9 +52,9 @@ pub(crate) fn check_for_unit_movement_system(
 
         let camera_transform = camera_query.single_mut().unwrap();
 
-        for (entity, unit, owned_by_wizard) in query.iter() {
+        for (entity, unit, owned_by_faction) in query.iter() {
 
-            if owned_by_wizard.wizard_id != 1 { continue; }
+            if owned_by_faction.faction_id != 1 { continue; }
 
             if unit.movement_points >= 1.0 {
                 if let Some(hex) = get_hex_clicked_on(&windows, &screen_size, camera_transform) {
@@ -81,7 +81,7 @@ pub(crate) fn check_for_unit_selection_system(
     screen_size: Res<ScreenSize>,
     mouse_input: Res<Input<MouseButton>>,
     windows: Res<Windows>,
-    unit_query: Query<(Entity, &Unit, &OwnedByWizard), Without<SelectedTag>>,
+    unit_query: Query<(Entity, &Unit, &OwnedByFaction), Without<SelectedTag>>,
     mut camera_query: Query<&Transform, (With<Camera>, With<MainCameraTag>)>
 ) {
     // if a unit is unselected and mouse left clicked in the hex that the unit is on
@@ -91,9 +91,9 @@ pub(crate) fn check_for_unit_selection_system(
 
         let camera_transform = camera_query.single_mut().unwrap();
 
-        for (entity, unit, owned_by_wizard) in unit_query.iter() {
+        for (entity, unit, owned_by_faction) in unit_query.iter() {
 
-            if owned_by_wizard.wizard_id != 1 { continue; }
+            if owned_by_faction.faction_id != 1 { continue; }
 
             if let Some(hex) = get_hex_clicked_on(&windows, &screen_size, camera_transform) {
                 if unit.location_hex == hex {
@@ -110,7 +110,7 @@ pub(crate) fn check_for_unit_unselection_system(
     images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
     mouse_input: Res<Input<MouseButton>>,
     windows: Res<Windows>,
-    unit_query: Query<(Entity, &Unit, &UnitBadge, &OwnedByWizard), With<SelectedTag>>,
+    unit_query: Query<(Entity, &Unit, &UnitBadge, &OwnedByFaction), With<SelectedTag>>,
     mut color_material_query: Query<&mut Handle<ColorMaterial>>,
     mut camera_query: Query<&Transform, (With<Camera>, With<MainCameraTag>)>
 ) {
@@ -121,9 +121,9 @@ pub(crate) fn check_for_unit_unselection_system(
 
         let camera_transform = camera_query.single_mut().unwrap();
 
-        for (entity, unit, unit_badge, owned_by_wizard) in unit_query.iter() {
+        for (entity, unit, unit_badge, owned_by_faction) in unit_query.iter() {
 
-            if owned_by_wizard.wizard_id != 1 { continue; }
+            if owned_by_faction.faction_id != 1 { continue; }
 
             if let Some(hex) = get_hex_clicked_on(&windows, &screen_size, camera_transform) {
                 if unit.location_hex != hex {
@@ -142,7 +142,7 @@ pub(crate) fn check_for_unit_hover_system(
     images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
     screen_size: Res<ScreenSize>,
     windows: Res<Windows>,
-    unit_query: Query<(&Unit, &UnitBadge, &OwnedByWizard), (Without<SelectedTag>, Without<IsMoving>)>,
+    unit_query: Query<(&Unit, &UnitBadge, &OwnedByFaction), (Without<SelectedTag>, Without<IsMoving>)>,
     mut color_material_query: Query<&mut Handle<ColorMaterial>>,
     mut camera_query: Query<&Transform, (With<Camera>, With<MainCameraTag>)>
 ) {
@@ -151,9 +151,9 @@ pub(crate) fn check_for_unit_hover_system(
 
     let camera_transform = camera_query.single_mut().unwrap();
 
-    for (unit, unit_badge, owned_by_wizard) in unit_query.iter() {
+    for (unit, unit_badge, owned_by_faction) in unit_query.iter() {
 
-        if owned_by_wizard.wizard_id != 1 { continue; }
+        if owned_by_faction.faction_id != 1 { continue; }
 
         if let Some(hex) = get_hex_clicked_on(&windows, &screen_size, camera_transform) {
             if unit.location_hex == hex {

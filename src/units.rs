@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use crate::constants::{BACKDROP_GREEN, BACKDROP_INDIGO, BACKDROP_RED, BACKLIGHT, HALF, HEX_SIZE, LAYOUT_SIZE, SCALE, UNIT_FRAME_INACTIVE, UNIT_HP_FILL};
 use crate::create_bundles::create_sprite_bundle;
 use crate::config::units::UnitTypes;
-use crate::components::{OwnedByWizard, ToBeSelectedTag, Unit, UnitBadge};
+use crate::components::{OwnedByFaction, ToBeSelectedTag, Unit, UnitBadge};
 use crate::hexagons::Hex;
 
 pub fn spawn_unit(
@@ -14,6 +14,7 @@ pub fn spawn_unit(
     location_hex: Hex,
     unit_type_id: u16,
     race_type_id: u8,
+    faction_id: u8,
     as_to_be_selected: bool
 ) {
     // spawns a unit composition entity into the ECS
@@ -21,17 +22,18 @@ pub fn spawn_unit(
 
     let unit_type = unit_types.get_by_id(unit_type_id);
     let image_id = unit_type.image_id;
-    let movement_points = unit_type.moves;
 
-    let backdrop_material_id = match race_type_id {
-        0 => panic!("Oh noes!"),
+    let backdrop_material_id = match faction_id {
+        0 => panic!("Faction Id [{}] does not exist.", faction_id),
         1 => BACKDROP_INDIGO,
         2 => BACKDROP_RED,
         3 => BACKDROP_GREEN,
-        4..=u8::MAX => panic!("Oh noes!")
+        4..=u8::MAX => panic!("Faction Id [{}] does not exist.", faction_id)
     };
 
     let world_position = location_hex.hex_to_pixel(LAYOUT_SIZE, SCALE); // calculate world position from hex
+
+    let unit = Unit::new(unit_type_id, location_hex, &unit_types);
 
     let value = images.get(&(6)); // 6: Units
     if let Some(texture_atlas) = value {
@@ -63,14 +65,12 @@ pub fn spawn_unit(
         let frame_bundle = create_sprite_bundle(sprite_dimensions, Vec3::default(), sprite_scale, color_material_handle_unit_frame);
         let frame = commands.spawn_bundle(frame_bundle).id();
 
-        let unit = Unit::new(unit_type_id, location_hex, movement_points);
-
         // root entity holding everything together
         let entity = commands
             .spawn_bundle((Transform::from_translation(position), GlobalTransform::identity(), UnitBadge { backdrop, backlight, unit_type, hp_fill, frame }))
             .push_children(&[backdrop, backlight, unit_type, hp_fill, frame])
             .insert(unit)
-            .insert(OwnedByWizard::new(race_type_id))
+            .insert(OwnedByFaction::new(faction_id))
             .id();
 
         if as_to_be_selected {

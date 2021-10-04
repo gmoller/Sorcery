@@ -103,13 +103,13 @@ fn setup_system(
     //let index = rng.gen_range(0..world_map.width * world_map.height);
 
     let index = 60;
-    spawn_unit(&mut commands, &world_map, &images, &unit_types, index, 1, true);
+    spawn_unit(&mut commands, &world_map, &images, &unit_types, index, 1, 1, true);
 
     let index = 61;
-    spawn_unit(&mut commands, &world_map, &images, &unit_types, index, 1, false);
+    spawn_unit(&mut commands, &world_map, &images, &unit_types, index, 1, 1, false);
 
     let index = 62;
-    spawn_unit(&mut commands, &world_map, &images, &unit_types, index, 2, false);
+    spawn_unit(&mut commands, &world_map, &images, &unit_types, index, 2, 2, false);
 
     //draw_crosshair(&asset_server, &mut materials, &mut commands);
 
@@ -130,10 +130,10 @@ fn load_config(commands: &mut Commands) -> config::units::UnitTypes {
     return unit_types;
 }
 
-fn spawn_unit(commands: &mut Commands, world_map: &resources::WorldMap, images: &std::collections::HashMap<i32, Vec<Handle<ColorMaterial>>>, unit_types: &config::units::UnitTypes, index: i32, race_type_id: u8, as_to_be_selected: bool) {
+fn spawn_unit(commands: &mut Commands, world_map: &resources::WorldMap, images: &std::collections::HashMap<i32, Vec<Handle<ColorMaterial>>>, unit_types: &config::units::UnitTypes, index: i32, race_type_id: u8, faction_id: u8, as_to_be_selected: bool) {
     let hex = world_map::convert_index_to_axial(index, world_map.width);
     // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
-    units::spawn_unit(commands, images, &unit_types, hex, 2, race_type_id, as_to_be_selected);
+    units::spawn_unit(commands, images, &unit_types, hex, 2, race_type_id, faction_id, as_to_be_selected);
 }
 
 // fn draw_crosshair(asset_server: &Res<AssetServer>, materials: &mut ResMut<Assets<ColorMaterial>>, commands: &mut Commands) {
