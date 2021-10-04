@@ -13,9 +13,9 @@ pub fn start_new_turn_update_system(
     // reset unit movement points and add NeedsOrders tag
     for (entity, mut unit) in unit_query.iter_mut() {
 
-        //if owned_by_faction.faction_id != 1 { continue; }
-
         unit.reset_movement_points(&unit_types);
+
+        commands.entity(entity).remove::<NeedsOrders>();
         commands.entity(entity).insert(NeedsOrders);
     }
 

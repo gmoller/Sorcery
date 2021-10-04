@@ -6,7 +6,7 @@ use crate::components::{IsMoving, MainCameraTag, OwnedByFaction, SelectedTag, To
 use crate::hexagons::{Hex, Point};
 use crate::resources::{ScreenSize, WorldMap};
 
-pub(crate) fn select_unit_system(
+pub fn select_unit_system(
     mut commands: Commands,
     images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
     mut unit_query: Query<(Entity, &Unit, &UnitBadge, &OwnedByFaction), With<ToBeSelectedTag>>,
@@ -28,6 +28,7 @@ pub(crate) fn select_unit_system(
 
         // change unit to active
         change_unit_frame(&mut color_material_query, unit_badge, &images, UNIT_FRAME_ACTIVE);
+        println!("Frame Active");
 
         commands.entity(entity).remove::<ToBeSelectedTag>();
         commands.entity(entity).insert(SelectedTag);
@@ -36,13 +37,13 @@ pub(crate) fn select_unit_system(
 
 }
 
-pub(crate) fn check_for_unit_movement_system(
+pub fn check_for_unit_movement_system(
     mut commands: Commands,
     screen_size: Res<ScreenSize>,
     mouse_input: Res<Input<MouseButton>>,
     windows: Res<Windows>,
     world_map: Res<WorldMap>,
-    query: Query<(Entity, &Unit, &OwnedByFaction), (With<SelectedTag>, Without<IsMoving>)>,
+    mut query: Query<(Entity, &mut Unit, &OwnedByFaction), (With<SelectedTag>, Without<IsMoving>)>,
     mut camera_query: Query<&Transform, (With<Camera>, With<MainCameraTag>)>
 ) {
     // if a unit is selected and mouse right clicked in a neighbouring hex
@@ -52,7 +53,7 @@ pub(crate) fn check_for_unit_movement_system(
 
         let camera_transform = camera_query.single_mut().unwrap();
 
-        for (entity, unit, owned_by_faction) in query.iter() {
+        for (entity, mut unit, owned_by_faction) in query.iter_mut() {
 
             if owned_by_faction.faction_id != 1 { continue; }
 
@@ -67,6 +68,9 @@ pub(crate) fn check_for_unit_movement_system(
         
                             let is_moving = IsMoving::new(hex);
                             commands.entity(entity).insert(is_moving);
+                            
+                            unit.movement_points -= 1.0;
+
                             break;
                         }
                     }
@@ -76,7 +80,7 @@ pub(crate) fn check_for_unit_movement_system(
     }
 }
 
-pub(crate) fn check_for_unit_selection_system(
+pub fn check_for_unit_selection_system(
     mut commands: Commands,
     screen_size: Res<ScreenSize>,
     mouse_input: Res<Input<MouseButton>>,
@@ -104,7 +108,7 @@ pub(crate) fn check_for_unit_selection_system(
     }
 }
 
-pub(crate) fn check_for_unit_unselection_system(
+pub fn check_for_unit_unselection_system(
     mut commands: Commands,
     screen_size: Res<ScreenSize>,
     images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
@@ -129,6 +133,7 @@ pub(crate) fn check_for_unit_unselection_system(
                 if unit.location_hex != hex {
                     // change unit to inactive
                     change_unit_frame(&mut color_material_query, unit_badge, &images, UNIT_FRAME_INACTIVE);
+                    println!("Frame Inactive");
 
                     commands.entity(entity).remove::<SelectedTag>();
                 }
@@ -138,7 +143,7 @@ pub(crate) fn check_for_unit_unselection_system(
 
 }
 
-pub(crate) fn check_for_unit_hover_system(
+pub fn check_for_unit_hover_system(
     images: Res<HashMap<i32, Vec<Handle<ColorMaterial>>>>,
     screen_size: Res<ScreenSize>,
     windows: Res<Windows>,
@@ -167,7 +172,7 @@ pub(crate) fn check_for_unit_hover_system(
     }
 }
 
-pub(crate) fn move_unit_system(
+pub fn move_unit_system(
     mut commands: Commands,
     time: Res<Time>,
     mut query: Query<(Entity, &mut Transform, &mut crate::components::Unit, &crate::components::IsMoving)>
@@ -196,8 +201,6 @@ pub(crate) fn move_unit_system(
             commands.entity(entity).remove::<IsMoving>();
             unit_translation.x = desintation_point.x as f32;
             unit_translation.y = desintation_point.y as f32;
-
-            unit.movement_points -= 1.0;
         }
 
     }
@@ -242,7 +245,7 @@ fn translate_mouse_position_to_world_hex(mouse_cursor_position: Vec2, screen_siz
     return world_hex;
 }
 
-fn check_if_off_map(hex: Hex, world_map_width: u16, world_map_height: u16) -> bool {
+pub fn check_if_off_map(hex: Hex, world_map_width: u16, world_map_height: u16) -> bool {
 
     if hex.r < 0 { return true; }
     if hex.r > (world_map_height as i32 - 1) { return true; }

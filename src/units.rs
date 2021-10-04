@@ -13,7 +13,6 @@ pub fn spawn_unit(
     unit_types: &UnitTypes,
     location_hex: Hex,
     unit_type_id: u16,
-    race_type_id: u8,
     faction_id: u8,
     as_to_be_selected: bool
 ) {

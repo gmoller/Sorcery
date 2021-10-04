@@ -1,3 +1,4 @@
+use bevy::window::WindowMode;
 use bevy::{prelude::*, input::system::exit_on_esc_system};
 //use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 //use rand::{Rng, thread_rng};
@@ -34,17 +35,17 @@ mod world_map_generator;
 
 fn main() {
     App::build()
-        .insert_resource(ClearColor(Color::BLACK)) // PINK
+        .insert_resource(ClearColor(Color::BLACK))
         .insert_resource(Msaa { samples: 4 })
         .insert_resource(WindowDescriptor {
             title: "Sorcery".to_string(),
-            width: 1900.0, // 1600
-            height: 900.0,
+            //width: 1900.0,
+            //height: 900.0,
             vsync: true,
-            resizable: false,
-            decorations: true, // show title bar
+            //resizable: false,
+            //decorations: true,
             cursor_visible: true,
-            //mode: WindowMode::BorderlessFullscreen,
+            mode: WindowMode::BorderlessFullscreen,
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)
@@ -59,19 +60,26 @@ fn main() {
         .add_system_set(SystemSet::on_exit(AppState::StartNewTurnState).with_system(systems::start_new_turn::start_new_turn_exit_system.system()))
 
         .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::move_camera::move_camera_system.system()))
-        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::select_unit_system.system()))
+        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::select_unit_system.system().after("check_for_unit_selection_system")))
         .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::check_for_unit_unselection_system.system()))
-        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::check_for_unit_selection_system.system()))
+        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::check_for_unit_selection_system.system().label("check_for_unit_selection_system")))
         .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::check_for_unit_hover_system.system()))
-        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::check_for_unit_movement_system.system()))
-        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::move_unit_system.system()))
+        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::check_for_unit_movement_system.system().label("check_for_unit_movement_system")))
+        .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::unit_systems::move_unit_system.system().after("check_for_unit_movement_system")))
         .add_system_set(SystemSet::on_update(AppState::PlayerTurnState).with_system(systems::player_turn::check_for_end_turn_system.system()))
         .add_system_set(SystemSet::on_enter(AppState::PlayerTurnState).with_system(systems::player_turn::player_turn_enter_system.system()))
         .add_system_set(SystemSet::on_exit(AppState::PlayerTurnState).with_system(systems::player_turn::player_turn_exit_system.system()))
 
+        .add_system_set(SystemSet::on_update(AppState::NPCsTurnState).with_system(systems::npcs_turn::give_orders_system.system().label("give_orders_system")))
+        .add_system_set(SystemSet::on_update(AppState::NPCsTurnState).with_system(systems::unit_systems::move_unit_system.system().after("give_orders_system")))
         .add_system_set(SystemSet::on_update(AppState::NPCsTurnState).with_system(systems::npcs_turn::check_for_end_turn_system.system()))
         .add_system_set(SystemSet::on_enter(AppState::NPCsTurnState).with_system(systems::npcs_turn::npcs_turn_enter_system.system()))
         .add_system_set(SystemSet::on_exit(AppState::NPCsTurnState).with_system(systems::npcs_turn::npcs_turn_exit_system.system()))
+
+        // .add_system_set(SystemSet::on_update(AppState::NPCsTurnState)
+        //     .with_system(systems::npcs_turn::give_orders_system.system().label("give_orders_system"))
+        //     .with_system(systems::unit_systems::move_unit_system.system().after("give_orders_system"))
+        //     .with_system(systems::npcs_turn::check_for_end_turn_system.system()))
 
         //.add_system(zoom_camera.system())
 
@@ -103,15 +111,13 @@ fn setup_system(
     //let index = rng.gen_range(0..world_map.width * world_map.height);
 
     let index = 60;
-    spawn_unit(&mut commands, &world_map, &images, &unit_types, index, 1, 1, true);
+    spawn_unit(&mut commands, &world_map, &images, &unit_types, index, 1, true);
 
     let index = 61;
-    spawn_unit(&mut commands, &world_map, &images, &unit_types, index, 1, 1, false);
+    spawn_unit(&mut commands, &world_map, &images, &unit_types, index, 1, false);
 
     let index = 62;
-    spawn_unit(&mut commands, &world_map, &images, &unit_types, index, 2, 2, false);
-
-    //draw_crosshair(&asset_server, &mut materials, &mut commands);
+    spawn_unit(&mut commands, &world_map, &images, &unit_types, index, 2, false);
 
     // position window
     window.set_position(IVec2::new(0, 0));
@@ -130,18 +136,8 @@ fn load_config(commands: &mut Commands) -> config::units::UnitTypes {
     return unit_types;
 }
 
-fn spawn_unit(commands: &mut Commands, world_map: &resources::WorldMap, images: &std::collections::HashMap<i32, Vec<Handle<ColorMaterial>>>, unit_types: &config::units::UnitTypes, index: i32, race_type_id: u8, faction_id: u8, as_to_be_selected: bool) {
+fn spawn_unit(commands: &mut Commands, world_map: &resources::WorldMap, images: &std::collections::HashMap<i32, Vec<Handle<ColorMaterial>>>, unit_types: &config::units::UnitTypes, index: i32, faction_id: u8, as_to_be_selected: bool) {
     let hex = world_map::convert_index_to_axial(index, world_map.width);
     // TODO: check that unit can be on the underlying tile type, and if he can't choose another hex
-    units::spawn_unit(commands, images, &unit_types, hex, 2, race_type_id, faction_id, as_to_be_selected);
+    units::spawn_unit(commands, images, &unit_types, hex, 2, faction_id, as_to_be_selected);
 }
-
-// fn draw_crosshair(asset_server: &Res<AssetServer>, materials: &mut ResMut<Assets<ColorMaterial>>, commands: &mut Commands) {
-//     let texture_handle = asset_server.load(CROSSHAIR);
-//     let material = materials.add(texture_handle.into());
-//     let sprite_dimensions = Vec2::new(50.0, 50.0);
-//     let sprite_scale = Vec3::new(1.0, 1.0, 1.0);
-//     let position = Vec3::new(0.0, 0.0, 10.0);
-//     let bundle = create_bundles::create_sprite_bundle(sprite_dimensions, position, sprite_scale, material);
-//     commands.spawn_bundle(bundle);
-// }

@@ -37,6 +37,7 @@ impl Unit {
 
         let unit_type = unit_types.get_by_id(self.unit_type_id);
         self.movement_points = unit_type.moves;
+        println!("Resetting movement points to {}.", unit_type.moves);
     }
 }
 
