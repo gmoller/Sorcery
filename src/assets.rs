@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use bevy::prelude::*;
 
-pub(crate) fn load_images(asset_server: &Res<AssetServer>, materials: &mut ResMut<Assets<ColorMaterial>>) -> HashMap<i32, Vec<Handle<ColorMaterial>>> {
+pub fn load_images(asset_server: &Res<AssetServer>, materials: &mut ResMut<Assets<ColorMaterial>>) -> HashMap<i32, Vec<Handle<ColorMaterial>>> {
     // loads assets using the Bevy asset_server
 
     let folders = [ ( "TerrainTiles/Basic", 0 ),

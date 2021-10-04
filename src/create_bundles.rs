@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-pub(crate) fn create_sprite_bundle(
+pub fn create_sprite_bundle(
     size: Vec2,
     position: Vec3,
     scale: Vec3,

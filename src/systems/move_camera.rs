@@ -34,8 +34,8 @@ pub fn move_camera_system(
         }
     }
 
-    camera_transform.translation.x = camera_transform.translation.x.clamp(950.0, 15360.0 - 950.0);
-    camera_transform.translation.y = camera_transform.translation.y.clamp(-7500.0, -450.0);
+    camera_transform.translation.x = camera_transform.translation.x.clamp(960.0, 15360.0 - 960.0);
+    camera_transform.translation.y = camera_transform.translation.y.clamp(-7500.0, -540.0);
 
     //println!("Camera coords: {}/{}", camera_transform.translation.x, camera_transform.translation.y);
 

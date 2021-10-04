@@ -1,12 +1,11 @@
 use std::collections::HashMap;
 use bevy::prelude::*;
 
-//use crate::constants::{HEX_OFFSET_Y, HEX_SIZE, LAYOUT_SIZE, SCALE};
 use crate::constants::{HALF, HEX_EXTRA_Y, HEX_SIZE, LAYOUT_SIZE, SCALE};
 use crate::hexagons::*;
 use crate::resources::WorldMap;
 
-pub(crate) fn spawn_map(commands: &mut Commands, world_map: &WorldMap, images: &HashMap<i32, Vec<Handle<ColorMaterial>>>) {
+pub fn spawn_map(commands: &mut Commands, world_map: &WorldMap, images: &HashMap<i32, Vec<Handle<ColorMaterial>>>) {
     // spawns the map into the ECS
 
     let scale = Vec3::new(SCALE.0, SCALE.1, 1.0);
@@ -46,7 +45,7 @@ fn create_tile(commands: &mut Commands, index: i32, world_map: &WorldMap, terrai
 
 }
 
-pub(crate) fn convert_index_to_axial(index: i32, map_width: u16) -> Hex { 
+pub fn convert_index_to_axial(index: i32, map_width: u16) -> Hex { 
     // converts array index to an axial hex
 
     let row = index / (map_width as i32);

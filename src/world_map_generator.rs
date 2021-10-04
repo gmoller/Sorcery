@@ -1,7 +1,7 @@
 use rand::Rng;
 
 #[allow(dead_code)]
-pub(crate) fn create_map_test() -> crate::resources::WorldMap {
+pub fn create_map_test() -> crate::resources::WorldMap {
     // 0-3: grassland, 4-7: ocean, 8-11: mountain; 12-15: desert; 16-19: forest; 20-23: swamp, 24-27: badlands, 28-31: black, 32-35: hills, 36-39: void
     let mut map = Vec::new();
     for i in 0..6 {
@@ -15,7 +15,7 @@ pub(crate) fn create_map_test() -> crate::resources::WorldMap {
     return world_map;
 }
 
-pub(crate) fn create_map(width: u16, height: u16) -> crate::resources::WorldMap {
+pub fn create_map(width: u16, height: u16) -> crate::resources::WorldMap {
     let temperature = generate_temperature(width, height);
     let elevation_noise = generate_elevation(width, height);
     let moisture_noise = generate_moisture(width, height, &temperature);

@@ -1,7 +1,7 @@
 use std::cmp;
 use noise::{NoiseFn, Seedable};
 
-pub(crate) fn generate_noise(width: u16, height: u16, octaves: Vec<(f64, u32)>) -> Vec<f64> {
+pub fn generate_noise(width: u16, height: u16, octaves: Vec<(f64, u32)>) -> Vec<f64> {
     let simplex = noise::OpenSimplex::new();
     simplex.set_seed(1974);
 
@@ -41,7 +41,7 @@ fn sum_up(values: Vec<f64>) -> f64 {
     return sum;
 }
 
-pub(crate) fn normalize(noise: Vec<f64>) -> Vec<f64> {
+pub fn normalize(noise: Vec<f64>) -> Vec<f64> {
     let min = get_min(&noise);
     let max = get_max(&noise);
 
@@ -76,7 +76,7 @@ fn get_max(list: &Vec<f64>) -> f64 {
     return max;
 }
 
-pub(crate) fn add_two_vectors(list1: &Vec<f64>, list2: &Vec<f64>) -> Vec<f64> {
+pub fn add_two_vectors(list1: &Vec<f64>, list2: &Vec<f64>) -> Vec<f64> {
     let small = cmp::min(list1.len(), list2.len());
 
     let mut result = Vec::new();
@@ -87,7 +87,7 @@ pub(crate) fn add_two_vectors(list1: &Vec<f64>, list2: &Vec<f64>) -> Vec<f64> {
     return result;
 }
 
-pub(crate) fn scale_vector(list: &Vec<f64>, scalar: f64) -> Vec<f64> {
+pub fn scale_vector(list: &Vec<f64>, scalar: f64) -> Vec<f64> {
     let mut result = Vec::new();
     for item in list {
         result.push(item * scalar);
