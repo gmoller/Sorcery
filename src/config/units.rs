@@ -11,8 +11,8 @@ pub struct UnitType {
     melee_attack: f32, // per figure
     defense: f32,      // per figure
     resistance: f32,   // per figure
-    hit_points: f32,    // per figure
-    pub image_id: u8
+    hit_points: f32,   // per figure
+    pub image_id: u8   // 0-255
 }
 
 pub struct UnitTypes {

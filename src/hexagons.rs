@@ -37,7 +37,6 @@ impl Hex {
     pub fn new_cube(q: i32, r: i32, s: i32) -> Hex {
         return Hex { q, r, s };
     }
-    #[allow(dead_code)]
     pub fn equals(&self, other: &Self) -> bool {
         return self.q == other.q && self.r == other.r && self.s == other.s;
     }

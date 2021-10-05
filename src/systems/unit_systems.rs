@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use bevy::{prelude::*, render::camera::Camera};
+use rand::{Rng, thread_rng};
 
 use crate::constants::{HALF, LAYOUT_SIZE, SCALE, UNIT_FRAME_ACTIVE, UNIT_FRAME_HOVERED, UNIT_FRAME_INACTIVE, UNIT_MOVEMENT_SPEED};
 use crate::components::{IsMoving, MainCameraTag, OwnedByFaction, SelectedTag, ToBeSelectedTag, Unit, UnitBadge};
@@ -175,7 +176,7 @@ pub fn check_for_unit_hover_system(
 pub fn move_unit_system(
     mut commands: Commands,
     time: Res<Time>,
-    mut query: Query<(Entity, &mut Transform, &mut crate::components::Unit, &crate::components::IsMoving)>
+    mut query: Query<(Entity, &mut Transform, &mut Unit, &IsMoving)>
 ) {
     // if a unit is moving, adjust it's transform to move closer to it's destination
     // if it has arrived at it's destination, remove the IsMoving component and set it's location
@@ -203,6 +204,33 @@ pub fn move_unit_system(
             unit_translation.y = desintation_point.y as f32;
         }
 
+    }
+
+}
+
+pub fn check_for_unit_overlap_system(
+    mut commands: Commands,
+    query_a: Query<(Entity, &Unit, &OwnedByFaction)>,
+    query_b: Query<(Entity, &Unit, &OwnedByFaction)>
+) {
+
+    for (entity_a, unit_a, owned_by_faction_a) in query_a.iter() {
+        for (entity_b, unit_b, owned_by_faction_b) in query_b.iter() {
+            if owned_by_faction_a.faction_id == owned_by_faction_b.faction_id { continue; } // same sides will not fight each other
+            if unit_a.location_hex.equals(&unit_b.location_hex) {
+                let mut rng = thread_rng();
+                if rng.gen::<bool>() {
+                    // unit a wins
+                    println!("Unit A wins!");
+                    commands.entity(entity_b).despawn_recursive();
+                } else {
+                    // unit b wins
+                    println!("Unit B wins!");
+                    commands.entity(entity_a).despawn_recursive();
+                }
+                return;
+            }
+        }
     }
 
 }
